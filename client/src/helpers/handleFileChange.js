@@ -1,9 +1,11 @@
 import axios from 'axios';
+import { toast } from 'react-toastify';
+import toastConfig from '../configs/toastConfig';
 
 const cloud_name = import.meta.env.VITE_cloud_name;
 const upload_preset = import.meta.env.VITE_upload_preset;
 
-export default async function handleFileChange(event, setFormData, folderName) {
+export default async function handleFileChange(event, folderName) {
     const file = event.target.files[0];
 
     if (!file) return;
@@ -17,12 +19,9 @@ export default async function handleFileChange(event, setFormData, folderName) {
 
     try {
         const response = await axios.post(`https://api.cloudinary.com/v1_1/${cloud_name}/image/upload`, formData);
-
         const imageURL = response.data.secure_url;
-        setFormData((prev) => ({
-            ...prev,
-            profile_picture: imageURL,
-        }));
+        
+        return imageURL;
     }
     catch (e) {
         console.log(e.message);

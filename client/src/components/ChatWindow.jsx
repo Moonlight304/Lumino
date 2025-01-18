@@ -1,22 +1,58 @@
+import axios from 'axios';
 import { CgProfile } from 'react-icons/cg';
 import { FiPaperclip } from 'react-icons/fi';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { toast } from 'react-toastify';
+import toastConfig from '../configs/toastConfig';
+import { useRecoilState } from 'recoil';
+import { socketState, userIDState } from '../configs/atoms';
+import handleFileChange from '../helpers/handleFileChange';
 
-export default function ChatWindow({
-    otherUser,
-    messages,
-    newMessage,
-    setNewMessage,
-    handleFileChange,
-    handleSendMessage,
-}) {
+const server_url = import.meta.env.VITE_server_url;
+const cloud_name = import.meta.env.VITE_cloud_name;
+const upload_preset = import.meta.env.VITE_upload_preset;
+
+export default function ChatWindow({ otherUser, otherUserID, messages, setMessages }) {
     const lastMessageRef = useRef(null);
+    const [globalUserID] = useRecoilState(userIDState);
+
+
+    const [newMessage, setNewMessage] = useState('');
 
     useEffect(() => {
         if (lastMessageRef.current) {
             lastMessageRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     }, [messages]);
+
+
+    async function handleMessage(cloud_image_url) {
+
+        if (!newMessage.trim() && !cloud_image_url) return;
+
+        try {
+            const response = await axios.post(`${server_url}/message/new_message/${otherUserID}`,
+                { newMessage, imageURL:cloud_image_url },
+                { headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` } }
+            );
+            const data = response.data;
+
+            if (data.status === 'success') {
+                setMessages((prev) => [
+                    ...prev,
+                    { senderID: globalUserID, receiverID: otherUserID, text: newMessage, image: cloud_image_url },
+                ]);
+                setNewMessage('');
+            }
+            else {
+                toast.warn(data.message, toastConfig);
+            }
+        }
+        catch (e) {
+            console.log(e.message);            
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+    }
 
     return (
         <div className="w-full md:w-2/3 h-full">
@@ -76,7 +112,10 @@ export default function ChatWindow({
                                     className="hidden"
                                     type="file"
                                     id="imageFile"
-                                    onChange={handleFileChange}
+                                    onChange={async (event) => {
+                                        const imageURL = await handleFileChange(event, 'uploads');
+                                        await handleMessage(imageURL);
+                                    }}
                                 />
                                 <label htmlFor="imageFile" className="p-3 mr-3 cursor-pointer rounded-full hover:bg-gray-600">
                                     <FiPaperclip className="scale-150" />
@@ -89,7 +128,7 @@ export default function ChatWindow({
                                     placeholder="Type a message..."
                                 />
                                 <button
-                                    onClick={handleSendMessage}
+                                    onClick={handleMessage}
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
                                 >
                                     Send

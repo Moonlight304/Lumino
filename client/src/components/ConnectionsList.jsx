@@ -1,21 +1,101 @@
 import { CgProfile } from 'react-icons/cg';
+import { useRecoilState } from 'recoil';
+import { userIDState } from '../configs/atoms';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import toastConfig from '../configs/toastConfig';
+import fetchUser from '../helpers/fetchUser';
+import { useEffect, useState } from 'react';
 
-export default function ConnectionsList({
-    tab,
-    setTab,
-    connected,
-    received,
-    sent,
-    isLoading,
-    setOtherUser,
-    setOtherUserID,
-}) {
-    const handleUserSelect = async (user) => {
+const server_url = import.meta.env.VITE_server_url;
+
+export default function ConnectionsList({ setOtherUser, setOtherUserID }) {
+    const [globalUserID] = useRecoilState(userIDState);
+    const [isLoading, setIsLoading] = useState(true);
+    const [tab, setTab] = useState('connected');
+    const [connected, setConnected] = useState([]);
+    const [received, setReceived] = useState([]);
+    const [sent, setSent] = useState([]);
+
+    useEffect(() => {
+        fetchTabUsers();
+    }, [tab]);
+
+
+    async function handleUserSelect(user) {
         setOtherUser(user);
         setOtherUserID(user?._id);
     };
 
-    const renderUserList = (users, emptyMessage) => {
+    async function fetchTabUsers() {
+        try {
+            const fetchedUser = await fetchUser(globalUserID);
+            const connectedPlayers = await Promise.all(fetchedUser?.connectedIDs.map(fetchUser));
+            setConnected(connectedPlayers);
+
+            const receivedPlayers = await Promise.all(fetchedUser?.receivedIDs.map(fetchUser));
+            setReceived(receivedPlayers);
+
+            const sentPlayers = await Promise.all(fetchedUser?.sentIDs.map(fetchUser));
+            setSent(sentPlayers);
+        }
+        catch (e) {
+            console.error(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+        finally {
+            setIsLoading(false);
+        }
+    }
+
+    async function handleAccept(senderUserID) {
+        try {
+            const response = await axios.get(`${server_url}/message/accept_request/${globalUserID}/${senderUserID}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                }
+            });
+            const data = response.data;
+
+            if (data.status === 'success') {
+                toast.success(data.message, toastConfig);
+                fetchTabUsers();
+            }
+            else {
+                toast.error(data.message, toastConfig);
+            }
+        }
+        catch (e) {
+            console.error(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+    }
+
+    async function handleCancel(senderUserID, receiverUserID) {
+        try {
+            const response = await axios.get(`${server_url}/message/cancel_request/${receiverUserID}/${senderUserID}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                }
+            });
+            const data = response.data;
+
+            if (data.status === 'success') {
+                toast.success(data.message, toastConfig);
+                fetchTabUsers();
+            }
+            else {
+                toast.error(data.message, toastConfig);
+            }
+        }
+        catch (e) {
+            console.error(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+    }
+
+
+    function renderUserList(users, emptyMessage) {
         if (users.length === 0) {
             return <div className="text-gray-400 p-4">{emptyMessage}</div>;
         }
@@ -23,19 +103,45 @@ export default function ConnectionsList({
         return users.map((user) => (
             <div
                 key={user?._id}
-                className="flex items-center cursor-pointer p-4 hover:bg-gray-700 transition duration-150 ease-in-out"
-                onClick={() => handleUserSelect(user)}
+                className="flex items-center justify-between cursor-pointer p-4 hover:bg-gray-700 transition duration-150 ease-in-out"
+                onClick={() => {
+                    if (tab === 'connected')
+                        return handleUserSelect(user)
+                }}
             >
-                {user?.profile_picture ? (
-                    <img
-                        className="w-12 h-12 rounded-full border-2 border-blue-500 object-cover mr-4"
-                        src={user.profile_picture || '/placeholder.svg'}
-                        alt={user.display_name}
-                    />
-                ) : (
-                    <CgProfile className="w-12 h-12 text-blue-500 mr-4" />
-                )}
-                <h2 className="text-lg font-semibold">{user?.display_name}</h2>
+                <div className="flex items-center">
+                    {user?.profile_picture ? (
+                        <img
+                            className="w-12 h-12 rounded-full border-2 border-blue-500 object-cover mr-4"
+                            src={user.profile_picture || '/placeholder.svg'}
+                            alt={user.display_name}
+                        />
+                    ) : (
+                        <CgProfile className="w-12 h-12 text-blue-500 mr-4" />
+                    )}
+                    <h2 className="text-lg font-semibold">{user?.display_name}</h2>
+                </div>
+
+                {tab !== 'connected' &&
+                    <div className='flex items-center justify-center gap-2'>
+                        {tab === 'received' &&
+                            <button
+                                className='bg-green-600 p-2 rounded-lg'
+                                onClick={() => handleAccept(user?._id)}
+                            > Accept </button>
+                        }
+
+                        <button
+                            className='bg-red-600 p-2 rounded-lg'
+                            onClick={() => {
+                                if (tab === 'received')
+                                    return handleCancel(user?._id, globalUserID);
+                                else
+                                    return handleCancel(globalUserID, user?._id);
+                            }}
+                        > Cancel </button>
+                    </div>
+                }
             </div>
         ));
     };

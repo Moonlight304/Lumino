@@ -23,6 +23,7 @@ export default function Navbar() {
             <button onClick={() => {
                 sessionStorage.removeItem('jwt_token');
                 setGlobalUserID(null);
+                setGlobalUserID('');
                 disconnectSocket();
                 navigate('/auth');
             }}> Logout </button>

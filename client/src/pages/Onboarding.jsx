@@ -11,7 +11,7 @@ import handleFileChange from '../helpers/handleFileChange';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function Onboarding() {   
+export default function Onboarding() {
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
     const [globalDisplayName, setGlobalDisplayName] = useRecoilState(displayNameState);
     const [showplaystyle, setShowplaystyle] = useState(false);
@@ -116,7 +116,13 @@ export default function Onboarding() {
                             name='profile_picture'
                             id='profile_picture'
                             className="hidden w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-1 py-1 focus:outline-none focus:border-primary"
-                            onChange={(event) => handleFileChange(event, setFormData, 'avatar')}
+                            onChange={async (event) => {
+                                const imageURL = await handleFileChange(event, 'avatars');
+                                setFormData((prev) => ({
+                                    ...prev,
+                                    profile_picture: imageURL,
+                                }));
+                            }}
                         />
                     </div>
 
