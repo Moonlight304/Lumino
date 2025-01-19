@@ -1,11 +1,13 @@
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { useRecoilState } from 'recoil';
-import { userIDState } from '../configs/atoms';
-import axios from 'axios';
+
 import { toast } from 'react-toastify';
 import toastConfig from '../configs/toastConfig';
+
+import { userIDState } from '../configs/atoms';
 import fetchUser from '../helpers/fetchUser';
-import { useEffect, useState } from 'react';
 
 const server_url = import.meta.env.VITE_server_url;
 

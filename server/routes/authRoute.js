@@ -39,7 +39,6 @@ router.post('/signup', async (req, res) => {
         const jwt_token = jwt.sign(
             {
                 userID: savedUser._id,
-                email: savedUser.email,
                 display_name: savedUser.display_name,
             },
             JWT_SECRET
@@ -91,7 +90,6 @@ router.post('/login', async (req, res) => {
         const jwt_token = jwt.sign(
             {
                 userID: existingUser._id,
-                email: existingUser.email,
                 display_name: existingUser.display_name
             },
             JWT_SECRET

@@ -1,19 +1,26 @@
 import axios from 'axios';
+import { useEffect, useRef, useState } from 'react';
+
 import { CgProfile } from 'react-icons/cg';
 import { FiPaperclip } from 'react-icons/fi';
-import { useEffect, useRef, useState } from 'react';
+import { FaImage } from "react-icons/fa6";
+
 import { toast } from 'react-toastify';
 import toastConfig from '../configs/toastConfig';
+
 import { useRecoilState } from 'recoil';
-import { userIDState } from '../configs/atoms';
+
 import handleFileChange from '../helpers/handleFileChange';
+import { userIDState } from '../configs/atoms';
+import { socketConnection } from '../configs/socketConnection';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function ChatWindow({ otherUser, otherUserID, messages, setMessages }) {
-    const lastMessageRef = useRef(null);
+export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOtherUserID, messages, setMessages }) {
+    const [socket, setSocket] = useState(null);
     const [globalUserID] = useRecoilState(userIDState);
 
+    const lastMessageRef = useRef(null);
 
     const [newMessage, setNewMessage] = useState('');
 
@@ -35,11 +42,15 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
             );
             const data = response.data;
 
+            const messageObject = { senderID: globalUserID, receiverID: otherUserID, text: newMessage, image: cloud_image_url };
             if (data.status === 'success') {
                 setMessages((prev) => [
                     ...prev,
-                    { senderID: globalUserID, receiverID: otherUserID, text: newMessage, image: cloud_image_url },
+                    messageObject,
                 ]);
+
+                socket.emit('messageObject', messageObject);
+
                 setNewMessage('');
             }
             else {
@@ -52,23 +63,49 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
         }
     }
 
+    useEffect(() => {
+        const newSocket = socketConnection(globalUserID);
+        setSocket(newSocket);
+
+        newSocket.on('messageObject', (messageObject) => {
+            setMessages((prev) => [...prev, messageObject]);
+        });
+
+        return () => {
+            newSocket.disconnect();
+        };
+    }, [globalUserID]);
+
+
     return (
         <div className="w-full md:w-2/3 h-full">
             <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
                 {otherUser ? (
                     <>
                         {/* Chat Header */}
-                        <div className="bg-gray-800 p-4 flex items-center">
-                            {otherUser?.profile_picture ? (
-                                <img
-                                    className="w-10 h-10 rounded-full border-2 border-blue-500 object-cover mr-4"
-                                    src={otherUser.profile_picture || '/placeholder.svg'}
-                                    alt={otherUser.display_name}
-                                />
-                            ) : (
-                                <CgProfile className="w-10 h-10 text-blue-500 mr-4" />
-                            )}
-                            <h2 className="text-xl font-semibold">{otherUser?.display_name}</h2>
+                        <div className='flex items-center justify-between'>
+                            <div className="bg-gray-800 p-4 flex items-center">
+                                {otherUser?.profile_picture ? (
+                                    <img
+                                        className="w-10 h-10 rounded-full border-2 border-blue-500 object-cover mr-4"
+                                        src={otherUser.profile_picture || '/placeholder.svg'}
+                                        alt={otherUser.display_name}
+                                    />
+                                ) : (
+                                    <CgProfile className="w-10 h-10 text-blue-500 mr-4" />
+                                )}
+                                <h2 className="text-xl font-semibold">{otherUser?.display_name}</h2>
+                            </div>
+
+                            <button
+                                className='scale-125 p-2 mr-5'
+                                onClick={() => {
+                                    setOtherUser(null);
+                                    setOtherUserID(null);
+                                }}
+                            >
+                                ❌
+                            </button>
                         </div>
 
                         {/* Chat Messages */}
@@ -88,14 +125,17 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
                                             } ${message?.text ? 'p-2' : 'p-1'}`}
                                     >
                                         {message?.text ? (
-                                            <p className='whitespace-normal break-words'> {message.text} </p>
-                                        ) : (
+                                            <p className="whitespace-normal break-words">{message.text}</p>
+                                        ) : message?.image ? (
                                             <img
-                                                src={message?.image || '/placeholder.svg'}
+                                                src={message?.image}
                                                 alt="Shared image"
                                                 className="max-w-full h-auto rounded-lg"
                                             />
+                                        ) : (
+                                            <FaImage className="w-auto h-[10rem] ps-1 pe-1" />
                                         )}
+
                                     </div>
                                 </div>
                             ))}
@@ -118,6 +158,11 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
                                 <label htmlFor="imageFile" className="p-3 mr-3 cursor-pointer rounded-full hover:bg-gray-600">
                                     <FiPaperclip className="scale-150" />
                                 </label>
+
+                                {/* <div >
+                                    <h1> Hello </h1>
+
+                                </div> */}
                                 <input
                                     type="text"
                                     value={newMessage}
@@ -131,12 +176,14 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
                                     }}
                                     placeholder="Type a message..."
                                 />
+
                                 <button
                                     onClick={async () => await handleMessage('')}
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
                                 >
                                     Send
                                 </button>
+
                             </div>
                         </div>
                     </>

@@ -1,12 +1,15 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { displayNameState, userIDState } from '../configs/atoms';
+import { useNavigate } from 'react-router-dom';
+
 import { useRecoilState } from 'recoil';
-import { countryCodes } from '../configs/countryCodes';
+import { CgProfile } from "react-icons/cg";
+
 import { toast } from 'react-toastify';
 import toastConfig from '../configs/toastConfig';
-import { useNavigate } from 'react-router-dom';
-import { CgProfile } from "react-icons/cg";
+import { countryCodes } from '../configs/countryCodes';
+import { displayNameState, userIDState } from '../configs/atoms';
+
 import handleFileChange from '../helpers/handleFileChange';
 
 const server_url = import.meta.env.VITE_server_url;

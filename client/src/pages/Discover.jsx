@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { useEffect, useState } from 'react';
-import { useRecoilState } from 'recoil';
-import { userIDState } from '../configs/atoms';
 import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
+
 import toastConfig from '../configs/toastConfig';
+import { userIDState } from '../configs/atoms';
+
 import UserCard from '../components/UserCard';
 import Navbar from '../components/Navbar';
 
@@ -40,7 +42,7 @@ export default function Discover() {
 
     async function fetchUsers(filterParams) {
         try {
-            const response = await axios.get(`${server_url}/discover?${filterParams}`, {
+            const response = await axios.get(`${server_url}/users/discover?${filterParams}`, {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`,
                 },

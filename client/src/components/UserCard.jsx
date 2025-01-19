@@ -2,11 +2,14 @@ import axios from "axios";
 import { CgProfile } from "react-icons/cg";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { FaGamepad, FaComments, FaMicrophoneAlt } from "react-icons/fa";
-import { countryCodes } from '../configs/countryCodes';
+
 import { toast } from "react-toastify";
 import toastConfig from "../configs/toastConfig";
-import { userIDState } from "../configs/atoms";
+
 import { useRecoilState } from "recoil";
+
+import { countryCodes } from '../configs/countryCodes';
+import { userIDState } from "../configs/atoms";
 
 const server_url = import.meta.env.VITE_server_url;
 

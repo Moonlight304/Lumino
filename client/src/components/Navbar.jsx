@@ -1,20 +1,13 @@
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import { displayNameState, userIDState, socketState } from "../configs/atoms";
+import { displayNameState, userIDState } from "../configs/atoms";
 
 
 export default function Navbar() {
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
     const [globalDisplayName] = useRecoilState(displayNameState);
-    const [globalSocket, setGlobalSocket] = useRecoilState(socketState);
 
     const navigate = useNavigate();
-
-    function disconnectSocket() {
-        if (globalSocket) {
-            globalSocket.disconnect();
-        }
-    }
 
     return (
         <header className="container mx-auto px-10 pt-4 pb-2 flex justify-between items-center border-b-2 border-white">
@@ -23,8 +16,7 @@ export default function Navbar() {
             <button onClick={() => {
                 sessionStorage.removeItem('jwt_token');
                 setGlobalUserID(null);
-                setGlobalUserID('');
-                disconnectSocket();
+                
                 navigate('/auth');
             }}> Logout </button>
 
