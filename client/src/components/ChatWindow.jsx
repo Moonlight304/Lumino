@@ -5,12 +5,10 @@ import { useEffect, useRef, useState } from 'react';
 import { toast } from 'react-toastify';
 import toastConfig from '../configs/toastConfig';
 import { useRecoilState } from 'recoil';
-import { socketState, userIDState } from '../configs/atoms';
+import { userIDState } from '../configs/atoms';
 import handleFileChange from '../helpers/handleFileChange';
 
 const server_url = import.meta.env.VITE_server_url;
-const cloud_name = import.meta.env.VITE_cloud_name;
-const upload_preset = import.meta.env.VITE_upload_preset;
 
 export default function ChatWindow({ otherUser, otherUserID, messages, setMessages }) {
     const lastMessageRef = useRef(null);
@@ -32,7 +30,7 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
 
         try {
             const response = await axios.post(`${server_url}/message/new_message/${otherUserID}`,
-                { newMessage, imageURL:cloud_image_url },
+                { newMessage, imageURL: cloud_image_url },
                 { headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` } }
             );
             const data = response.data;
@@ -49,7 +47,7 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
             }
         }
         catch (e) {
-            console.log(e.message);            
+            console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
     }
@@ -90,7 +88,7 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
                                             } ${message?.text ? 'p-2' : 'p-1'}`}
                                     >
                                         {message?.text ? (
-                                            message.text
+                                            <p className='whitespace-normal break-words'> {message.text} </p>
                                         ) : (
                                             <img
                                                 src={message?.image || '/placeholder.svg'}
@@ -125,10 +123,16 @@ export default function ChatWindow({ otherUser, otherUserID, messages, setMessag
                                     value={newMessage}
                                     onChange={(e) => setNewMessage(e.target.value)}
                                     className="flex-grow bg-gray-800 text-white rounded-l-lg p-2 focus:outline-none"
+                                    onKeyDown={async (e) => {
+                                        if (e.key === "Enter") {
+                                            e.preventDefault();
+                                            await handleMessage('');
+                                        }
+                                    }}
                                     placeholder="Type a message..."
                                 />
                                 <button
-                                    onClick={handleMessage}
+                                    onClick={async () => await handleMessage('')}
                                     className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-lg"
                                 >
                                     Send
