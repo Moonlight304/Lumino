@@ -16,9 +16,10 @@ import { socketConnection } from '../configs/socketConnection';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOtherUserID, messages, setMessages }) {
+export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, setRemoteUserID, messages, setMessages }) {
     const [socket, setSocket] = useState(null);
     const [globalUserID] = useRecoilState(userIDState);
+    const [remoteUserIsTyping, setRemoteUserIsTyping] = useState(false);
 
     const lastMessageRef = useRef(null);
 
@@ -36,13 +37,13 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
         if (!newMessage.trim() && !cloud_image_url) return;
 
         try {
-            const response = await axios.post(`${server_url}/message/new_message/${otherUserID}`,
+            const response = await axios.post(`${server_url}/message/new_message/${remoteUserID}`,
                 { newMessage, imageURL: cloud_image_url },
                 { headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` } }
             );
             const data = response.data;
 
-            const messageObject = { senderID: globalUserID, receiverID: otherUserID, text: newMessage, image: cloud_image_url };
+            const messageObject = { senderID: globalUserID, receiverID: remoteUserID, text: newMessage, image: cloud_image_url };
             if (data.status === 'success') {
                 setMessages((prev) => [
                     ...prev,
@@ -71,41 +72,69 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
             setMessages((prev) => [...prev, messageObject]);
         });
 
+        newSocket.on('isTyping', (isTyping) => {
+            setRemoteUserIsTyping(isTyping);
+        })
+
         return () => {
             newSocket.disconnect();
         };
     }, [globalUserID]);
 
+    const typingTimeout = useRef(null);
+
+    function handleTyping(value) {
+        setNewMessage(value);
+
+        socket.emit('isTyping', true, remoteUserID);
+
+        // Clear the previous timeout and set a new one
+        clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => {
+            socket.emit('isTyping', false, remoteUserID);
+        }, 500);
+    };
+
+    
 
     return (
         <div className="w-full md:w-2/3 h-full">
             <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
-                {otherUser ? (
+                {remoteUser ? (
                     <>
                         {/* Chat Header */}
                         <div className='flex items-center justify-between'>
                             <div className="bg-gray-800 p-4 flex items-center">
-                                {otherUser?.profile_picture ? (
+                                {remoteUser?.profile_picture ? (
                                     <img
                                         className="w-10 h-10 rounded-full border-2 border-blue-500 object-cover mr-4"
-                                        src={otherUser.profile_picture || '/placeholder.svg'}
-                                        alt={otherUser.display_name}
+                                        src={remoteUser.profile_picture || '/placeholder.svg'}
+                                        alt={remoteUser.display_name}
                                     />
                                 ) : (
                                     <CgProfile className="w-10 h-10 text-blue-500 mr-4" />
                                 )}
-                                <h2 className="text-xl font-semibold">{otherUser?.display_name}</h2>
+                                <h2 className="text-xl font-semibold">{remoteUser?.display_name}</h2>
                             </div>
 
-                            <button
-                                className='scale-125 p-2 mr-5'
-                                onClick={() => {
-                                    setOtherUser(null);
-                                    setOtherUserID(null);
-                                }}
-                            >
-                                ❌
-                            </button>
+                            <div>
+                                {/* <button
+                                    className='scale-125 p-2 mr-5'
+                                    onClick={handleCall}
+                                >
+                                    📞
+                                </button> */}
+
+                                <button
+                                    className='scale-125 p-2 mr-5'
+                                    onClick={() => {
+                                        setRemoteUser(null);
+                                        setRemoteUserID(null);
+                                    }}
+                                >
+                                    ❌
+                                </button>
+                            </div>
                         </div>
 
                         {/* Chat Messages */}
@@ -113,13 +142,13 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
                             {messages?.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`mb-4 ${message?.senderID === otherUser?._id
+                                    className={`mb-4 ${message?.senderID === remoteUser?._id
                                         ? 'chat chat-start'
                                         : 'chat chat-end'
                                         }`}
                                 >
                                     <div
-                                        className={`inline-block chat-bubble rounded-lg max-w-[70%] ${message?.senderID === otherUser?._id
+                                        className={`inline-block chat-bubble rounded-lg max-w-[70%] ${message?.senderID === remoteUser?._id
                                             ? 'bg-gray-700 text-white'
                                             : 'bg-blue-600 text-white'
                                             } ${message?.text ? 'p-2' : 'p-1'}`}
@@ -141,6 +170,9 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
                             ))}
                             {/* Ref to the last message */}
                             <div ref={lastMessageRef} />
+
+                            {remoteUserIsTyping && <div className='chat chat-start chat-bubble'> typing... </div>}
+
                         </div>
 
                         {/* Message Input */}
@@ -151,7 +183,7 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
                                     type="file"
                                     id="imageFile"
                                     onChange={async (event) => {
-                                        const imageURL = await handleFileChange(event, 'uploads');
+                                        const imageURL = await handleFileChange(event, 'chats');
                                         await handleMessage(imageURL);
                                     }}
                                 />
@@ -166,12 +198,13 @@ export default function ChatWindow({ otherUser, setOtherUser, otherUserID, setOt
                                 <input
                                     type="text"
                                     value={newMessage}
-                                    onChange={(e) => setNewMessage(e.target.value)}
+                                    onChange={(e) => handleTyping(e.target.value)}
                                     className="flex-grow bg-gray-800 text-white rounded-l-lg p-2 focus:outline-none"
                                     onKeyDown={async (e) => {
                                         if (e.key === "Enter") {
                                             e.preventDefault();
                                             await handleMessage('');
+                                            socket.emit('isTyping', false, globalUserID);
                                         }
                                     }}
                                     placeholder="Type a message..."

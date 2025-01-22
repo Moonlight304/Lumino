@@ -6,15 +6,15 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 const authMiddleware = require('../middleware/authMiddle');
 
-router.get('/:otherID', authMiddleware, async (req, res) => {
-    const { otherID } = req.params;
+router.get('/:remoteID', authMiddleware, async (req, res) => {
+    const { remoteID } = req.params;
     const { userID } = req.user;
 
     try {
-        if (!otherID) return;
+        if (!remoteID) return;
 
-        const otherUser = await User.findById(otherID);
-        if (!otherUser)
+        const remoteUser = await User.findById(remoteID);
+        if (!remoteUser)
             return res.json({
                 status: 'fail',
                 message: 'User not found'
@@ -22,8 +22,8 @@ router.get('/:otherID', authMiddleware, async (req, res) => {
 
         const allMessages = await Message.find({
             $or: [
-                { senderID: userID, receiverID: otherID },
-                { senderID: otherID, receiverID: userID },
+                { senderID: userID, receiverID: remoteID },
+                { senderID: remoteID, receiverID: userID },
             ],
         }).sort({ createdAt: 1 });
 
@@ -41,20 +41,20 @@ router.get('/:otherID', authMiddleware, async (req, res) => {
     }
 })
 
-router.post('/new_message/:otherID', authMiddleware, async (req, res) => {
-    const { otherID } = req.params;
+router.post('/new_message/:remoteID', authMiddleware, async (req, res) => {
+    const { remoteID } = req.params;
     const { userID } = req.user;
     const { newMessage, imageURL } = req.body;
 
     try {
-        const otherUser = await User.findById(otherID);
-        if (!otherUser)
+        const remoteUser = await User.findById(remoteID);
+        if (!remoteUser)
             return res.json({
                 status: 'fail',
                 message: 'User not found'
             })
 
-        const message = Message({ senderID: userID, receiverID: otherID, text: newMessage, image: imageURL });
+        const message = Message({ senderID: userID, receiverID: remoteID, text: newMessage, image: imageURL });
         await message.save()
 
         return res.json({

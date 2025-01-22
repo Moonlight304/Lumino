@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaUserFriends, FaSearch, FaComments, FaGamepad } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
@@ -10,7 +10,7 @@ export default function Landing() {
     const navigate = useNavigate();
     useEffect(() => {
         if (globalUserID) {
-            navigate(-1);
+            navigate('/');
         }
     }, []);
 
@@ -21,9 +21,8 @@ export default function Landing() {
                 <div className="text-2xl font-bold text-primary">Lumino</div>
                 <nav className="hidden md:block">
                     <ul className="flex space-x-6">
-                        <li><a href="#" className="p-2 rounded-lg hover:bg-primary transition duration-300">Home</a></li>
-                        <li><a href="#" className="p-2 rounded-lg hover:bg-primary transition duration-300">Community</a></li>
-                        {/* <li> <Link to={'/auth'} className="p-2 rounded-lg hover:bg-primary transition duration-300"> Login </Link></li> */}
+                        <Link to={'/'} className="p-2 rounded-lg hover:bg-primary transition duration-300"> Home </Link>
+                        <Link to={'/feed'} className="p-2 rounded-lg hover:bg-primary transition duration-300"> Community </Link>
                     </ul>
                 </nav>
                 <button className="md:hidden text-2xl">☰</button>
@@ -96,7 +95,7 @@ export default function Landing() {
             {/* Footer */}
             <footer className="bg-gray-900 py-8">
                 <div className="container mx-auto px-4 text-center">
-                    <p>&copy; 2025 Lumino. All rights reserved.</p>
+                    <p>&copy; {new Date().getFullYear()} Lumino. All rights reserved.</p>
                     <div className="mt-4">
                         <a href="#" className="text-gray-400 hover:text-primary mx-2 transition duration-300">Terms of Service</a>
                         <a href="#" className="text-gray-400 hover:text-primary mx-2 transition duration-300">Privacy Policy</a>

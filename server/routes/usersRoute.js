@@ -20,6 +20,9 @@ router.get('/discover', authMiddleware, async (req, res) => {
             communication_preference,
         } = req.query;
 
+        console.log(req.query);
+        
+
         const user = await User.findById(userID);
         if (!user)
             return res.json({

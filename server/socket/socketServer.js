@@ -31,12 +31,20 @@ io.on('connection', (socket) => {
     console.log('Mapping : ');
     console.log(usersSocketMap);
 
+    // socket.on('join-room', () => {
+
+    // })
+
+    // message socket
     socket.on('messageObject', (messageObject) => {
         console.log('Sending message to : ', usersSocketMap[messageObject.receiverID]);
         console.log(messageObject);
-
-        
         io.to(usersSocketMap[messageObject.receiverID]).emit('messageObject', messageObject);
+    })
+
+    // isTyping socket
+    socket.on('isTyping', (isTyping, receiverID) => {
+        io.to(usersSocketMap[receiverID]).emit('isTyping', isTyping);
     })
 
     socket.on('disconnect', () => {

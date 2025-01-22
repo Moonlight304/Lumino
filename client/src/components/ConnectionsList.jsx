@@ -11,7 +11,7 @@ import fetchUser from '../helpers/fetchUser';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function ConnectionsList({ setOtherUser, setOtherUserID }) {
+export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
     const [globalUserID] = useRecoilState(userIDState);
     const [isLoading, setIsLoading] = useState(true);
     const [tab, setTab] = useState('connected');
@@ -25,8 +25,8 @@ export default function ConnectionsList({ setOtherUser, setOtherUserID }) {
 
 
     async function handleUserSelect(user) {
-        setOtherUser(user);
-        setOtherUserID(user?._id);
+        setRemoteUser(user);
+        setRemoteUserID(user?._id);
     };
 
     async function fetchTabUsers() {

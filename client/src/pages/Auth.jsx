@@ -29,7 +29,7 @@ export default function Auth() {
 
     useEffect(() => {
         if (globalUserID) {
-            navigate(-1);
+            navigate('/discover');
         }
     }, []);
 

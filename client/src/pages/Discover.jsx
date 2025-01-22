@@ -37,6 +37,7 @@ export default function Discover() {
 
     const applyFilters = () => {
         const filterParams = new URLSearchParams(filters).toString();
+        console.log(filterParams);
         fetchUsers(filterParams);
     };
 
@@ -69,11 +70,11 @@ export default function Discover() {
     const navigate = useNavigate();
     useEffect(() => {
         if (!globalUserID) {
-            navigate(-1);
+            navigate('/');
         }
 
         fetchUsers('');
-    }, []);
+    }, [globalUserID]);
 
     return (
         <>

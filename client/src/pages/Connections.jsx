@@ -6,19 +6,22 @@ import toastConfig from '../configs/toastConfig';
 import Navbar from "../components/Navbar";
 import ConnectionsList from "../components/ConnectionsList";
 import ChatWindow from "../components/ChatWindow";
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { userIDState } from '../configs/atoms';
 
 const server_url = import.meta.env.VITE_server_url;
 
 export default function Connections() {
-
-    const [otherUserID, setOtherUserID] = useState(null);
-    const [otherUser, setOtherUser] = useState(null);
+    const [globalUserID] = useRecoilState(userIDState);
+    const [remoteUserID, setRemoteUserID] = useState(null);
+    const [remoteUser, setRemoteUser] = useState(null);
     
     const [messages, setMessages] = useState([]);
 
     async function handleChatWindow() {
         try {
-            const response = await axios.get(`${server_url}/message/${otherUserID}`, {
+            const response = await axios.get(`${server_url}/message/${remoteUserID}`, {
                 headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
             });
             setMessages(response.data.allMessages);
@@ -30,10 +33,15 @@ export default function Connections() {
     }
 
     useEffect(() => {
-        if (otherUserID) handleChatWindow();
-    }, [otherUserID]);
+        if (remoteUserID) handleChatWindow();
+    }, [remoteUserID]);
 
-
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!globalUserID) {
+            navigate('/');
+        }
+    }, []);
 
     return (
         <div className="bg-background min-h-screen text-white">
@@ -43,15 +51,15 @@ export default function Connections() {
                 <div className="flex flex-col md:flex-row gap-8 h-full">
 
                     <ConnectionsList
-                        setOtherUser={setOtherUser}
-                        setOtherUserID={setOtherUserID}
+                        setRemoteUser={setRemoteUser}
+                        setRemoteUserID={setRemoteUserID}
                     />
 
                     <ChatWindow
-                        otherUser={otherUser}
-                        setOtherUser={setOtherUser}
-                        setOtherUserID={setOtherUserID}
-                        otherUserID={otherUserID}
+                        remoteUser={remoteUser}
+                        setRemoteUser={setRemoteUser}
+                        setRemoteUserID={setRemoteUserID}
+                        remoteUserID={remoteUserID}
                         messages={messages}
                         setMessages={setMessages}
                     />

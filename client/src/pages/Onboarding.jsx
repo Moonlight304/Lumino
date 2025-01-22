@@ -34,7 +34,7 @@ export default function Onboarding() {
 
     useEffect(() => {
         if (!globalUserID) {
-            navigate(-1);
+            navigate('/');
         }
     }, []);
 
