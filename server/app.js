@@ -19,7 +19,7 @@ const PORT = process.env.PORT || 3000;
 const authRoute = require('./routes/authRoute');
 const messageRoute = require('./routes/messageRoute');
 const usersRoute = require('./routes/usersRoute');
-
+const postRoute = require('./routes/postRoute');
 
 
 
@@ -37,6 +37,8 @@ app.use(express.json());
 app.use('/auth', authRoute);
 app.use('/message', messageRoute);
 app.use('/users', usersRoute);
+app.use('/posts', postRoute);
+
 
 
 app.get('/', (req, res) => {

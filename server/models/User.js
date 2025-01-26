@@ -1,5 +1,24 @@
 const mongoose = require('mongoose');
 
+const notificationSchema = new mongoose.Schema({
+    typeOfNotification : {
+        type : String,
+        enum : ['like', 'new post', 'comment', 'follow'],
+        required : true,
+    },
+    message : {
+        type : String,
+        required : true,
+    },
+    action_url : {
+        type : String,
+    },
+    createdAt : {
+        type : Date,
+        default : Date.now,
+    }
+})
+
 const userSchema = new mongoose.Schema({
     display_name: {
         type: String,
@@ -115,6 +134,14 @@ const userSchema = new mongoose.Schema({
             index: true,
         }
     ],
+    posts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+            index: true,
+        }
+    ],
+    notifications : [notificationSchema],
 })
 
 const User = mongoose.model('User', userSchema);

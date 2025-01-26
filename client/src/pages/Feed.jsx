@@ -1,41 +1,76 @@
-import { useState, useRef } from "react";
-import Navbar from "../components/Navbar";
+import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useRecoilState } from 'recoil';
+import { toast } from 'react-toastify';
+
+import toastConfig from '../configs/toastConfig';
+import { userIDState } from '../configs/atoms';
+
+import Navbar from '../components/Navbar';
+import PostCard from '../components/PostCard';
+
+const server_url = import.meta.env.VITE_server_url;
 
 export default function Feed() {
-    const videoRef = useRef(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const [globalUserID] = useRecoilState(userIDState);
+    const [posts, setPosts] = useState([]);
 
-    const startVideo = async () => {
+    async function getPosts() {
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-            console.log(stream);
+            const response = await axios.get(`${server_url}/posts/`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                }
+            });
+            const data = response.data;
+            console.log(data);
 
-            if (videoRef.current) {
-                videoRef.current.srcObject = stream;
+            if (data.status === 'success') {
+                setPosts(data.allPosts);
+            } else {
+                toast.error(data.message, toastConfig);
             }
-        }
-        catch (e) {
+
+        } catch (e) {
             console.log(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        } finally {
+            setIsLoading(false);
         }
-    };
+    }
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!globalUserID) {
+            navigate('/');
+        }
+        getPosts();
+    }, [globalUserID]);
 
     return (
         <>
             <Navbar />
 
-            <h1>Feed Page</h1>
-
-            <button onClick={startVideo}>
-                Start Video
-            </button>
-
-            <div className="transform scale-x-[-1]">
-                <video
-                    ref={videoRef}
-                    autoPlay
-                    playsInline
-                    controls
-                ></video>
-            </div>
+            {isLoading ? (
+                <h1>Loading...</h1>
+            ) : (
+                <>
+                    {posts.length > 0 ? (
+                        posts.map((post, index) => {
+                            return (
+                                <PostCard
+                                    key={index}
+                                    post={post}
+                                />
+                            );
+                        })
+                    ) : (
+                        <h1>No posts available</h1>
+                    )}
+                </>
+            )}
         </>
     );
 }
