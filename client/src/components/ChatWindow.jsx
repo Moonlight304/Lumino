@@ -13,6 +13,8 @@ import { useRecoilState } from 'recoil';
 import handleFileChange from '../helpers/handleFileChange';
 import { userIDState } from '../configs/atoms';
 import { socketConnection } from '../configs/socketConnection';
+import { useNavigate } from 'react-router-dom';
+import peer from '../configs/peer';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -22,6 +24,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
     const [remoteUserIsTyping, setRemoteUserIsTyping] = useState(false);
 
     const lastMessageRef = useRef(null);
+    const navigate = useNavigate();
 
     const [newMessage, setNewMessage] = useState('');
 
@@ -64,6 +67,17 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
         }
     }
 
+    async function handleIncomingCall(newSocket, callerSocketID, offer) {
+        console.log('Incoming call from : ', callerSocketID);
+        const answer = await peer.getAnswer(offer);
+
+        console.log('Socket:');
+        console.log(newSocket);
+        
+        newSocket.emit('call-accepted', ({ callerSocketID, answer }));
+        navigate(`/call/${globalUserID}`);
+    }
+
     useEffect(() => {
         const newSocket = socketConnection(globalUserID);
         setSocket(newSocket);
@@ -74,6 +88,10 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
 
         newSocket.on('isTyping', (isTyping) => {
             setRemoteUserIsTyping(isTyping);
+        })
+
+        newSocket.on('incoming-call', ({ callerSocketID, offer }) => {
+            handleIncomingCall(newSocket, callerSocketID, offer);
         })
 
         return () => {
@@ -95,7 +113,6 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
         }, 500);
     };
 
-    
 
     return (
         <div className="w-full md:w-2/3 h-full">
@@ -118,9 +135,11 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                             </div>
 
                             <div>
-                                {/* <button
+
+                                {/* audio and video calling, under development
+                                <button
                                     className='scale-125 p-2 mr-5'
-                                    onClick={handleCall}
+                                    onClick={() => navigate(`/call/${remoteUserID}`)}
                                 >
                                     📞
                                 </button> */}

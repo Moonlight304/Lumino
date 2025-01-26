@@ -8,6 +8,7 @@ import Discover from './pages/Discover';
 import Feed from './pages/Feed';
 import Notifications from './pages/Notifications';
 import Connections from './pages/Connections';
+import Call from './pages/Call';
 
 export default function App() {
     return (
@@ -20,6 +21,7 @@ export default function App() {
                 <Route path='/feed' element={<Feed />} />
                 <Route path='/notifications' element={<Notifications />} />
                 <Route path='/connections' element={<Connections />} />
+                <Route path='/call/:callingUserID' element={<Call />} />
 
             </Routes>
         </div>

@@ -16,6 +16,7 @@ const io = require("socket.io")(server, {
 
 
 const usersSocketMap = {};
+const socketsUserMap = {};
 
 io.on('connection', (socket) => {
     console.log(`A user connected : ${socket.id}`);
@@ -23,18 +24,25 @@ io.on('connection', (socket) => {
     const userID = socket.handshake.auth.userID;
 
 
-    if (userID)
+    if (userID) {
         usersSocketMap[userID] = socket.id;
+        socketsUserMap[socket.id] = userID;
+    }
     else
         console.log('Invalid User');
 
     console.log('Mapping : ');
     console.log(usersSocketMap);
 
-    // socket.on('join-room', () => {
+    // call
+    socket.on('new-call', ({ remoteUserID, offer }) => {
+        io.to(usersSocketMap[remoteUserID]).emit('incoming-call', { callerSocketID: socket.id, offer });
+    })
 
-    // })
-
+    socket.on('call-accepted', ({ callerSocketID, answer }) => {
+        io.to(callerSocketID).emit('call-accepted', { remoteSocketID: socket.id, answer });
+    })
+    
     // message socket
     socket.on('messageObject', (messageObject) => {
         console.log('Sending message to : ', usersSocketMap[messageObject.receiverID]);
