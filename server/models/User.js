@@ -110,31 +110,14 @@ const userSchema = new mongoose.Schema({
             index: true,
         }
     ],
-    followersCount: {
-        type: Number,
-        default: 0, 
-        required: true,
-    },
-    followers: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            index: true,
-        }
-    ],
-    followingCount: {
-        type: Number,
-        default: 0,
-        required: true,
-    },
-    following: [
-        {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'User',
-            index: true,
-        }
-    ],
     posts: [
+        {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Post',
+            index: true,
+        }
+    ],
+    savedPosts: [
         {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Post',

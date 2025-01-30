@@ -29,6 +29,19 @@ export function getDisplayName() {
     }
 }
 
+export function getAvatarURL() {
+    try {
+        const jwt_token = sessionStorage.getItem('jwt_token');
+        if (!jwt_token) {
+            return null;
+        }
+        const decodedObj = jwtDecode(jwt_token);
+        return decodedObj.avatarURL;
+    }
+    catch (e) {
+        return null;
+    }
+}
 
 export const userIDState = atom({
     key: 'userIDState',
@@ -39,3 +52,8 @@ export const displayNameState = atom({
     key: 'displayNameState',
     default: getDisplayName(),
 });
+
+export const avatarURLState = atom({
+    key: 'avatarURLState',
+    default: getAvatarURL(),
+})

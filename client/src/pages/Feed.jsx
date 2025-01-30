@@ -4,11 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 
+
 import toastConfig from '../configs/toastConfig';
 import { userIDState } from '../configs/atoms';
 
 import Navbar from '../components/Navbar';
 import PostCard from '../components/PostCard';
+import NewPostCard from '@/components/NewPostCard';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -29,14 +31,17 @@ export default function Feed() {
 
             if (data.status === 'success') {
                 setPosts(data.allPosts);
-            } else {
+            }
+            else {
                 toast.error(data.message, toastConfig);
             }
 
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
-        } finally {
+        }
+        finally {
             setIsLoading(false);
         }
     }
@@ -56,8 +61,13 @@ export default function Feed() {
             {isLoading ? (
                 <h1>Loading...</h1>
             ) : (
-                <>
-                    {posts.length > 0 ? (
+                <div className='flex flex-col items-center'>
+                    <NewPostCard
+                        setPosts={setPosts}
+                    />
+
+                    {posts.length > 0
+                        ?
                         posts.map((post, index) => {
                             return (
                                 <PostCard
@@ -66,10 +76,10 @@ export default function Feed() {
                                 />
                             );
                         })
-                    ) : (
-                        <h1>No posts available</h1>
-                    )}
-                </>
+                        : (
+                            <h1>No posts available</h1>
+                        )}
+                </div>
             )}
         </>
     );

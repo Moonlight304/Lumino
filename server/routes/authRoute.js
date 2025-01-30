@@ -13,14 +13,14 @@ const authMiddleware = require('../middleware/authMiddle');
 router.post('/signup', async (req, res) => {
     try {
         const { display_name, email, password } = req.body;
-        
+
         if (!display_name || !password || !email)
             return res.json({
                 status: 'fail',
                 message: 'Insufficient data',
             })
 
-        
+
         const existingUser = await User.findOne({ email });
 
         if (existingUser)
@@ -35,11 +35,12 @@ router.post('/signup', async (req, res) => {
         const newUser = User({ display_name, email, passwordHash });
         const savedUser = await newUser.save();
 
-        
+
         const jwt_token = jwt.sign(
             {
                 userID: savedUser._id,
                 display_name: savedUser.display_name,
+                avatarURL: ''
             },
             JWT_SECRET
         );
@@ -49,7 +50,8 @@ router.post('/signup', async (req, res) => {
             message: 'Signed up',
             jwt_token,
             userID: savedUser._id,
-            display_name: savedUser.display_name
+            display_name: savedUser.display_name,
+            avatarURL: ''
         })
     }
     catch (e) {
@@ -90,7 +92,8 @@ router.post('/login', async (req, res) => {
         const jwt_token = jwt.sign(
             {
                 userID: existingUser._id,
-                display_name: existingUser.display_name
+                display_name: existingUser.display_name,
+                avatarURL: existingUser.profile_picture
             },
             JWT_SECRET
         );
@@ -100,7 +103,8 @@ router.post('/login', async (req, res) => {
             message: 'Logged in',
             jwt_token,
             userID: existingUser._id,
-            display_name: existingUser.display_name
+            display_name: existingUser.display_name,
+            avatarURL: existingUser.profile_picture
         })
     }
     catch (e) {
@@ -112,7 +116,7 @@ router.post('/login', async (req, res) => {
 })
 
 router.post('/onboarding', authMiddleware, async (req, res) => {
-    const { userID } = req.user;    
+    const { userID } = req.user;
 
     try {
         const user = await User.findById(userID);
@@ -123,16 +127,18 @@ router.post('/onboarding', authMiddleware, async (req, res) => {
             });
         }
 
-        await User.updateOne({ _id: userID }, {
-            age: req.body.age,
-            bio: req.body.bio,
-            profile_picture: req.body.profile_picture,
-            country: req.body.country,
-            gender: req.body.gender,
-            platform: req.body.platform,
-            playstyle: req.body.playstyle,
-            communication_preference: req.body.communication_preference,
-        })
+        await User.updateOne(
+            { _id: userID },
+            {
+                age: req.body.age,
+                bio: req.body.bio,
+                profile_picture: req.body.profile_picture,
+                country: req.body.country,
+                gender: req.body.gender,
+                platform: req.body.platform,
+                playstyle: req.body.playstyle,
+                communication_preference: req.body.communication_preference,
+            })
 
         return res.status(200).json({
             status: 'success',

@@ -47,7 +47,7 @@ export default function Connections() {
         <div className="bg-background min-h-screen text-white">
             <Navbar />
 
-            <div className="container mx-auto px-4 py-8 h-[calc(100vh-64px)]">
+            <div className="container mx-auto -mt-2 px-4 py-8 h-[calc(100vh-64px)]">
                 <div className="flex flex-col md:flex-row gap-8 h-full">
 
                     <ConnectionsList

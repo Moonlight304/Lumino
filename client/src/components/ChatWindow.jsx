@@ -161,15 +161,12 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                             {messages?.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={`mb-4 ${message?.senderID === remoteUser?._id
-                                        ? 'chat chat-start'
-                                        : 'chat chat-end'
-                                        }`}
+                                    className={` ${message?.senderID !== remoteUser?._id && 'text-right' }`}
                                 >
                                     <div
-                                        className={`inline-block chat-bubble rounded-lg max-w-[70%] ${message?.senderID === remoteUser?._id
-                                            ? 'bg-gray-700 text-white'
-                                            : 'bg-blue-600 text-white'
+                                        className={`inline-block max-w-[70%] mb-4 rounded-lg  ${message?.senderID === remoteUser?._id
+                                            ? 'bg-gray-700 text-white  rounded-bl-none'
+                                            : 'bg-white text-black x rounded-br-none'
                                             } ${message?.text ? 'p-2' : 'p-1'}`}
                                     >
                                         {message?.text ? (

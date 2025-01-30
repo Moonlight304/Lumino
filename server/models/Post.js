@@ -32,10 +32,6 @@ const postSchema = new mongoose.Schema({
     user_avatar: {
         type: String,
     },
-    title: {
-        type: String,
-        required: true,
-    },
     body: {
         type: String,
         required: true,

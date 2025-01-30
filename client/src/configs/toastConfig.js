@@ -1,4 +1,4 @@
-import { Bounce } from 'react-toastify';
+import { Slide } from 'react-toastify';
 
 const toastConfig = {
     position: "top-center",
@@ -9,7 +9,7 @@ const toastConfig = {
     draggable: true,
     progress: undefined,
     theme: "dark",
-    transition: Bounce,
+    transition: Slide,
 }
 
 export default toastConfig;

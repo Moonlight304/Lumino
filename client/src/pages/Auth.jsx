@@ -7,7 +7,7 @@ import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import toastConfig from '../configs/toastConfig';
 
-import { userIDState, displayNameState } from '../configs/atoms';
+import { userIDState, displayNameState, avatarURLState } from '../configs/atoms';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -15,6 +15,7 @@ export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
     const [globalDisplayName, setGlobalDisplayName] = useRecoilState(displayNameState);
+    const [globalAvatarURL, setGlobalAvatarURL] = useRecoilState(avatarURLState);
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -48,6 +49,7 @@ export default function Auth() {
                     sessionStorage.setItem('jwt_token', data.jwt_token);
                     setGlobalUserID(data.userID);
                     setGlobalDisplayName(data.display_name);
+                    setGlobalAvatarURL(data.avatarURL);
 
                     toast.success('Logged In', toastConfig);
                     navigate('/discover');

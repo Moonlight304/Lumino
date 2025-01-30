@@ -57,9 +57,9 @@ router.get('/:postID', authMiddleware, async (req, res) => {
 router.post('/new_post', authMiddleware, async (req, res) => {
     try {
         const { userID } = req.user;
-        const { title, body, imageURL } = req.body;
+        const { body, imageURL } = req.body;
 
-        if (!title || !body)
+        if (!body)
             return res.json({
                 status: 'fail',
                 message: 'Incomplete Data',
@@ -67,8 +67,8 @@ router.post('/new_post', authMiddleware, async (req, res) => {
 
         const user = await User.findById(userID);
 
-        const newPost = Post({ userID, display_name: user.display_name, user_avatar: user.profile_picture, title, body, imageURL });
-        const savedPost = await newPost.save();
+        const newPost = Post({ userID, display_name: user.display_name, user_avatar: user.profile_picture, body, imageURL });
+        const savedPost = await newPost.save();      
 
         const postSaveUpdate = User.findOneAndUpdate(
             { _id: userID },
@@ -100,7 +100,7 @@ router.post('/new_post', authMiddleware, async (req, res) => {
         return res.json({
             status: 'success',
             message: 'Post added successfully',
-            postID: savedPost._id,
+            newPost: savedPost
         })
     }
     catch (e) {
@@ -203,7 +203,7 @@ router.get('/delete_post/:postID', authMiddleware, async (req, res) => {
 
         return res.json({
             status: 'success',
-            message: 'Deleted post successfully',
+            message: 'Deleted post',
         })
     }
     catch (e) {
@@ -372,5 +372,7 @@ router.get('/:postID/checkLiked', authMiddleware, async (req, res) => {
         })
     }
 })
+
+
 
 module.exports = router;
