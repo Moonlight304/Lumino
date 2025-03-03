@@ -2,6 +2,8 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt, FaRegBookmark, FaBookmark } from 'react-icons/fa'
+import { CiGlobe } from "react-icons/ci";
+import { GoPeople } from "react-icons/go";
 import { FaImage } from "react-icons/fa6";
 import {
     DropdownMenu,
@@ -24,6 +26,7 @@ import toastConfig from '../configs/toastConfig'
 import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
+import { CgProfile } from 'react-icons/cg';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -149,19 +152,37 @@ export default function PostCard({ post }) {
             <div className="p-4 border-b-[#999999] border-b-2 w-[95%]">
                 <div className="flex items-center space-x-4 relative">
                     <div className="w-12 h-12 rounded-full overflow-hidden bg-[#616161]">
-                        <img src={post?.user_avatar || "/placeholder.svg"} alt={post?.display_name} className="w-full h-full object-cover" />
+                        {/* <img src={post?.user_avatar || "/placeholder.svg"} alt={post?.display_name} className="w-full h-full object-cover" /> */}
+                        {post?.user_avatar
+                            ?
+                            <img src={post?.user_avatar} alt="avatar_image" className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
+                            :
+                            <CgProfile className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
+                        }
                     </div>
                     <div>
                         <h2 className="inline-block text-lg font-semibold text-white hover:underline "> <Link to={`/user/${post?.userID}`}>{post?.display_name}</Link></h2>
-                        <p className="text-sm text-[#BDBDBD]"> {timeAgo} </p>
+
+                        <div className='flex items-center gap-2'>
+                            <p className="text-sm text-[#BDBDBD]"> {timeAgo} </p>
+
+                            <div className='cursor-pointer'>
+                                {post?.visibility === 'everyone'
+                                    ?
+                                    <CiGlobe className='w-5 h-5' />
+                                    :
+                                    <GoPeople className='w-5 h-5' />
+                                }
+                            </div>
+                        </div>
                     </div>
 
-                    <div className='absolute right-5'>
+                    <div className='flex items-center gap-3 absolute right-5 '>
                         <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                                 <Button variant="outline"> ⚙️ </Button>
                             </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-56">
+                            <DropdownMenuContent>
                                 <DropdownMenuGroup>
                                     {globalUserID === post?.userID &&
                                         <>
@@ -173,9 +194,6 @@ export default function PostCard({ post }) {
                                             </DropdownMenuItem>
                                         </>
                                     }
-                                    <DropdownMenuItem>
-                                        Save
-                                    </DropdownMenuItem>
                                 </DropdownMenuGroup>
                             </DropdownMenuContent>
                         </DropdownMenu>
@@ -184,7 +202,7 @@ export default function PostCard({ post }) {
                 </div>
             </div>
             <div className="px-4 py-2 space-y-4 w-full">
-                <p className="text-[#BDBDBD] w-full break-all">{post?.body}</p>
+                <p className="text-[#BDBDBD] w-full break-all whitespace-pre-wrap"> {post?.body.trim()} </p>
                 {post?.imageURL &&
                     (
                         <div className="relative w-full pt-[56.25%] border-2 border-[#999999] rounded-lg">
@@ -199,7 +217,7 @@ export default function PostCard({ post }) {
                 }
             </div>
             <div className="w-[90%] px-4 py-3 border-t border-[#616161] flex justify-between items-center">
-                <div className="flex space-x-4">
+                <div className="flex space-x-4 gap-4">
                     <button
                         className={`flex items-center space-x-1 ${isLiked ? 'text-[#FF3333]' : 'text-[#BDBDBD]'}`}
                         onClick={isLiked ? handleDislike : handleLike}
@@ -211,26 +229,28 @@ export default function PostCard({ post }) {
                         )}
                         <span>{likeCount}</span>
                     </button>
-                    <button className="flex items-center space-x-1 text-[#BDBDBD]">
+
+                    <button
+                        className={`flex items-center space-x-1 ${isSaved ? 'text-[#FF3333]' : 'text-[#BDBDBD]'}`}
+                        onClick={handleSave}
+                    >
+                        {isSaved ? (
+                            <FaBookmark className="h-6 w-6" />
+                        ) : (
+                            <FaRegBookmark className="h-6 w-6" />
+                        )}
+                        <span>{isSaved ? 'Saved' : 'Save'}</span>
+                    </button>
+                    
+                    {/* <button className="flex items-center space-x-1 text-[#BDBDBD]">
                         <FaRegComment className="h-6 w-6" />
                         <span>Comment</span>
                     </button>
                     <button className="flex items-center space-x-1 text-[#BDBDBD]">
                         <FaShareAlt className="h-6 w-6" />
                         <span>Share</span>
-                    </button>
+                    </button> */}
                 </div>
-                <button
-                    className={`flex items-center space-x-1 ${isSaved ? 'text-[#FF3333]' : 'text-[#BDBDBD]'}`}
-                    onClick={handleSave}
-                >
-                    {isSaved ? (
-                        <FaBookmark className="h-6 w-6" />
-                    ) : (
-                        <FaRegBookmark className="h-6 w-6" />
-                    )}
-                    <span>{isSaved ? 'Saved' : 'Save'}</span>
-                </button>
             </div>
         </div >
     )

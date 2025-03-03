@@ -45,14 +45,14 @@ export default function UserCard({ user }) {
                     {user?.profile_picture ? (
                         <img
                             className="w-28 h-28 rounded-full border-2 border-secondary object-cover mr-4"
-                            src={user.profile_picture || "/placeholder.svg"}
+                            src={user.profile_picture}
                             alt={user.display_name}
                         />
                     ) : (
                         <CgProfile className="w-28 h-28 rounded-full border-2 border-secondary object-cover mr-4" />
                     )}
                     <div>
-                        <h2 className="text-xl font-semibold text-gray-800 dark:text-white">{user?.display_name}</h2>
+                        <h2 className="text-xl font-semibold text-gray-300 dark:text-white">{user?.display_name}</h2>
                         <div className="flex items-center mt-1">
                             {user.country ? (
                                 <img
@@ -63,24 +63,24 @@ export default function UserCard({ user }) {
                             ) : (
                                 <span className="mr-2">🌍</span>
                             )}
-                            <span className="text-lg text-gray-600 dark:text-gray-300">{user?.age} </span>
+                            <span className="text-lg text-gray-400 dark:text-gray-300">{user?.age} </span>
                         </div>
                     </div>
                 </div>
 
                 {user?.bio && (
-                    <p className="text-gray-600 dark:text-gray-300 mb-4">{user?.bio}</p>
+                    <p className="text-gray-400 mb-4">{user?.bio}</p>
                 )}
 
                 <div className="space-y-2 mb-4">
                     {user?.platform && (
-                        <div className="flex items-center text-lg text-gray-600 dark:text-gray-300">
+                        <div className="flex items-center text-lg text-gray-400">
                             <FaGamepad className="mr-2" />
                             <span>{user.platform}</span>
                         </div>
                     )}
                     {user?.playstyle && (
-                        <div className="flex items-center text-lg text-gray-600 dark:text-gray-300">
+                        <div className="flex items-center text-lg text-gray-400 ">
                             {user?.playstyle === 'Casual'
                                 ? <span className="mr-2"> 😎 </span>
                                 : <span className="mr-2"> 🔥 </span>
@@ -89,7 +89,7 @@ export default function UserCard({ user }) {
                         </div>
                     )}
                     {user?.communication_preference && (
-                        <div className="flex items-center text-lg text-gray-600 dark:text-gray-300">
+                        <div className="flex items-center text-lg text-gray-400">
                             {user?.communication_preference === 'Voice'
                                 ? <FaMicrophoneAlt className="mr-2" />
                                 : <FaComments className="mr-2" />

@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const notificationSchema = new mongoose.Schema({
     typeOfNotification : {
         type : String,
-        enum : ['like', 'new post', 'comment', 'follow'],
+        enum : ['like', 'new post', 'connection request', 'connection accepted'],
         required : true,
     },
     message : {
@@ -12,6 +12,10 @@ const notificationSchema = new mongoose.Schema({
     },
     action_url : {
         type : String,
+    },
+    read: {
+        type: Boolean,
+        default: false,
     },
     createdAt : {
         type : Date,
@@ -48,8 +52,8 @@ const userSchema = new mongoose.Schema({
         default: '',
     },
     age: {
-        type: String,
-        default: '',
+        type: Number,
+        default: 0,
     },
     gender : {
         type: String,
@@ -66,18 +70,18 @@ const userSchema = new mongoose.Schema({
     },
     platform: {
         type: String,
-        enum: ['PC', 'PlayStation', 'Xbox', 'Android', 'IOS', ''],
+        enum: ['Any', 'PC', 'PlayStation', 'Xbox', 'Android', 'IOS', ''],
         default: '',
     },
     playstyle: {
         type: String,
-        enum: ['Casual', 'Competitive', ''],
+        enum: ['Any', 'Casual', 'Competitive', ''],
         default: '',
     },
     communication_preference: {
         type: String,
         default: '',
-        enum: ['Voice', 'Text', ''],
+        enum: ['Any', 'Voice', 'Text','Both', ''],
     },
     discord_username: {
         type: String,

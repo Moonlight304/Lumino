@@ -4,7 +4,23 @@ import { useRecoilState } from "recoil";
 import { displayNameState, avatarURLState } from "@/configs/atoms";
 import { FaImage } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
+import { CiGlobe } from "react-icons/ci";
+import { GoPeople } from "react-icons/go";
 import { Button } from "@/components/ui/button";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuGroup,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuPortal,
+    DropdownMenuSeparator,
+    DropdownMenuShortcut,
+    DropdownMenuSub,
+    DropdownMenuSubContent,
+    DropdownMenuSubTrigger,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 import handleFileChange from "@/helpers/handleFileChange";
 import { toast } from "react-toastify";
@@ -17,11 +33,12 @@ export default function NewPostCard({ setPosts }) {
     const [globalAvatarURL] = useRecoilState(avatarURLState);
     const [body, setBody] = useState('');
     const [imageURL, setImageURL] = useState('');
+    const [visibility, setVisibility] = useState('everyone');
 
     async function handleNewPost() {
         try {
             const response = await axios.post(`${server_url}/posts/new_post`,
-                { body, imageURL },
+                { body, imageURL, visibility },
                 {
                     headers: {
                         Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
@@ -40,10 +57,12 @@ export default function NewPostCard({ setPosts }) {
             }
             else {
                 toast.error(data.message, toastConfig);
+                console.log(data.message);
             }
         }
         catch (e) {
             toast.error('Oops try again', toastConfig);
+            console.log(e.message);
         }
     }
 
@@ -108,8 +127,40 @@ export default function NewPostCard({ setPosts }) {
                     />
                 </label>
 
-                <div onClick={handleNewPost}>
-                    <Button> Post </Button>
+                <div className="flex gap-2">
+                    <div>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="outline">
+                                    {visibility === 'everyone'
+                                        ?
+                                        <CiGlobe />
+                                        :
+                                        <GoPeople />
+                                    }
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent >
+                                <DropdownMenuGroup>
+                                    <DropdownMenuItem className='flex justify-around items-center gap-4'
+                                        onClick={() => setVisibility('everyone')}
+                                    >
+                                        Everyone <CiGlobe />
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem className='flex justify-around items-center gap-4'
+                                        onClick={() => setVisibility('connections')}
+                                    >
+                                        Connections <GoPeople />
+                                    </DropdownMenuItem>
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
+
+                    <div onClick={handleNewPost}>
+                        <Button> Post </Button>
+                    </div>
                 </div>
             </div>
         </div>

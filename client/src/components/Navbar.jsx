@@ -6,9 +6,9 @@ import { CgProfile } from "react-icons/cg";
 export default function Navbar() {
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
     const [globalDisplayName] = useRecoilState(displayNameState);
-    const [globalAvatarURL] = useRecoilState(avatarURLState)
+    const [globalAvatarURL] = useRecoilState(avatarURLState);    
 
-    const navigate = useNavigate();
+    const navigate = useNavigate();   
 
     return (
         <header className="container mx-auto px-10 py-1 flex justify-between items-center border-b-2 border-[#999999]">
@@ -32,10 +32,10 @@ export default function Navbar() {
                         <Link to={'/profile'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex items-center px-3">
                             {globalAvatarURL
                                 ?
-                                <img src={globalAvatarURL} alt="avatar_image" className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4"/>
+                                <img src={globalAvatarURL} alt="avatar_image" className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
                                 :
-                                <CgProfile className="w-28 h-28 rounded-full border-2 border-secondary object-cover mr-4" />
-                        }
+                                <CgProfile className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
+                            }
                             <h1> {globalDisplayName} </h1>
                         </Link>
                     </li>

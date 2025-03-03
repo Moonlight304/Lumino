@@ -127,6 +127,8 @@ router.post('/onboarding', authMiddleware, async (req, res) => {
             });
         }
 
+
+
         await User.updateOne(
             { _id: userID },
             {
@@ -138,7 +140,11 @@ router.post('/onboarding', authMiddleware, async (req, res) => {
                 platform: req.body.platform,
                 playstyle: req.body.playstyle,
                 communication_preference: req.body.communication_preference,
-            })
+                favourite_games: req.body.favourite_games ? req.body.favourite_games.split(',').map(game => game.trim()) : [],
+                favourite_genres: req.body.favourite_genres ? req.body.favourite_genres.split(',').map(genre => genre.trim()) : []
+            }
+        );
+
 
         return res.status(200).json({
             status: 'success',

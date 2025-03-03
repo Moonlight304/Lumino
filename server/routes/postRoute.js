@@ -8,7 +8,24 @@ const authMiddleware = require('../middleware/authMiddle');
 
 router.get('/', authMiddleware, async (req, res) => {
     try {
-        const allPosts = await Post.find({}).sort({ createdAt: -1 });
+        const { userID } = req.user;
+
+        const user = await User.findById(userID);
+        if (!user) 
+            return res.json({
+                status: 'fail',
+                message: 'User not found'
+            })
+
+
+            const allPosts = await Post.find({
+                $or: [
+                    { userID: userID },
+                    { visibility: 'everyone' },
+                    { visibility: 'connections', userID: { $in: user.connectedIDs } }
+                ]
+            }).sort({ createdAt: -1 });
+            
 
         return res.json({
             status: 'success',
@@ -17,7 +34,7 @@ router.get('/', authMiddleware, async (req, res) => {
     }
     catch (e) {
         return res.json({
-            status: 'fail', 
+            status: 'fail',
             message: e.message,
         })
     }
@@ -56,8 +73,9 @@ router.get('/:postID', authMiddleware, async (req, res) => {
 
 router.post('/new_post', authMiddleware, async (req, res) => {
     try {
+
         const { userID } = req.user;
-        const { body, imageURL } = req.body;
+        const { body, imageURL, visibility } = req.body;
 
         if (!body)
             return res.json({
@@ -67,8 +85,8 @@ router.post('/new_post', authMiddleware, async (req, res) => {
 
         const user = await User.findById(userID);
 
-        const newPost = Post({ userID, display_name: user.display_name, user_avatar: user.profile_picture, body, imageURL });
-        const savedPost = await newPost.save();      
+        const newPost = Post({ userID, display_name: user.display_name, user_avatar: user.profile_picture, body, imageURL, visibility });
+        const savedPost = await newPost.save();
 
         const postSaveUpdate = User.findOneAndUpdate(
             { _id: userID },
@@ -77,22 +95,28 @@ router.post('/new_post', authMiddleware, async (req, res) => {
             }
         );
 
+
         const notificationUpdate = async () => {
-            const notification = {
-                _id: new mongoose.mongo.ObjectId(),
-                typeOfNotification: 'new post',
-                message: `${user.display_name} just posted!`,
-                action_url: `/post/${savedPost._id}`,
-            };
 
-            const notificationPromises = user.followers.map(async (followerID) => {
-                const follower = await User.findById(followerID);
-                follower.notifications.unshift(notification);
-                await follower.save();
-            });
+            if (user.connectedIDs.length > 0) {
+                const notification = {
+                    _id: new mongoose.mongo.ObjectId(),
+                    typeOfNotification: 'new post',
+                    message: `${user.display_name} just posted!`,
+                    action_url: `/post/${savedPost._id}`,
+                };
 
-            await Promise.all(notificationPromises);
+                const notificationPromises = user.connectedIDs.map(async (connectedID) => {
+                    const connection = await User.findById(connectedID);
+                    connection.notifications.unshift(notification);
+                    await connection.save();
+                });
+
+                await Promise.all(notificationPromises);
+            }
+
         };
+
 
         await Promise.all([postSaveUpdate, notificationUpdate()]);
 
@@ -104,6 +128,7 @@ router.post('/new_post', authMiddleware, async (req, res) => {
         })
     }
     catch (e) {
+        console.log(e.message);
         return res.json({
             status: 'fail',
             message: e.message,
@@ -255,7 +280,7 @@ router.get('/like/:postID', authMiddleware, async (req, res) => {
                     _id: new mongoose.mongo.ObjectId(),
                     typeOfNotification: 'like',
                     message: `${display_name} liked your post!`,
-                    action_url: `/post/${post?._id}`
+                    action_url: ''
                 };
 
                 const user = await User.findById(post?.userID);

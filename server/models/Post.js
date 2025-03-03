@@ -39,6 +39,10 @@ const postSchema = new mongoose.Schema({
     imageURL: {
         type: String,
     },
+    visibility: {
+        type: String,
+        enum: ['everyone', 'connections']
+    },
     createdAt: {
         type: Date,
         default: Date.now,

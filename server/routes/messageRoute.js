@@ -97,6 +97,15 @@ router.get('/send_request/:senderID/:receiverID', authMiddleware, async (req, re
             }
         )
 
+        const notification = {
+            _id: new mongoose.mongo.ObjectId(),
+            typeOfNotification: 'connection request',
+            message: `${sender.display_name} is requesting to connect`,
+            action_url: `/connections`,
+        };
+        receiver.notifications.unshift(notification);
+
+
         await Promise.all([senderUpdate, receiverUpdate]);
 
         return res.json({

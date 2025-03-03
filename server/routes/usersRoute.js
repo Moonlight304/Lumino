@@ -11,7 +11,8 @@ router.get('/discover', authMiddleware, async (req, res) => {
     try {
         const {
             country,
-            age,
+            ageLower,
+            ageUpper,
             gender,
             favourite_games,
             favourite_genres,
@@ -21,7 +22,7 @@ router.get('/discover', authMiddleware, async (req, res) => {
         } = req.query;
 
         console.log(req.query);
-        
+
 
         const user = await User.findById(userID);
         if (!user)
@@ -39,20 +40,33 @@ router.get('/discover', authMiddleware, async (req, res) => {
 
         // Add filters dynamically
         if (country) filterQuery.country = country;
-        if (age) filterQuery.age = age;
         if (gender) filterQuery.gender = gender;
         if (platform) filterQuery.platform = platform;
         if (playstyle) filterQuery.playstyle = playstyle;
         if (communication_preference) filterQuery.communication_preference = communication_preference;
 
+        let ageL = Number(ageLower) || 0;
+        let ageU = Number(ageUpper) || 100;
+
+
+        if (!isNaN(ageL) || !isNaN(ageU)) {
+            filterQuery.age = {};
+            if (!isNaN(ageL)) filterQuery.age.$gte = ageL;
+            if (!isNaN(ageU)) filterQuery.age.$lte = ageU;
+        }
+
         if (favourite_games) {
             const gamesArray = favourite_games.split(',');
+            console.log(gamesArray);
             filterQuery.favourite_games = { $in: gamesArray };
         }
         if (favourite_genres) {
             const genresArray = favourite_genres.split(',');
             filterQuery.favourite_genres = { $in: genresArray };
         }
+
+        console.log(filterQuery);
+
 
         const allUsers = await User.find(filterQuery);
 
@@ -84,7 +98,7 @@ router.get('/getUser/:userID', authMiddleware, async (req, res) => {
                 status: 'fail',
                 message: 'User not found'
             })
-        
+
         return res.json({
             status: 'success',
             user
@@ -94,6 +108,50 @@ router.get('/getUser/:userID', authMiddleware, async (req, res) => {
         return res.json({
             status: 'fail',
             message: e.message,
+        })
+    }
+})
+
+router.get('/mark_notification/:notificationID', authMiddleware, async (req, res) => {
+    const { userID } = req.user;
+    const { notificationID } = req.params;
+
+    try {
+        if (!userID || !notificationID)
+            return res.json({
+                status: 'fail',
+                message: 'Incomplete attributes'
+            })
+
+        const user = await User.findById(userID);
+
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'User not found'
+            })
+
+        console.log(user.notifications);
+
+        user?.notifications?.forEach((notification) => {
+            if (notification._id == notificationID) {
+                notification.read = true;
+                return;
+            }
+        })
+
+        await user.save();
+
+
+        return res.json({
+            status: 'success',
+            message: 'marked as read'
+        });
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: e.message + 'fa;fkad;fk;kj',
         })
     }
 })
