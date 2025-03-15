@@ -2,7 +2,7 @@ import axios from 'axios'
 import React, { useEffect, useState } from 'react'
 import { formatDistanceToNow, parseISO } from 'date-fns';
 import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt, FaRegBookmark, FaBookmark } from 'react-icons/fa'
-import { CiGlobe } from "react-icons/ci";
+import { CiGlobe, CiMedicalClipboard } from "react-icons/ci";
 import { GoPeople } from "react-icons/go";
 import { FaImage } from "react-icons/fa6";
 import {
@@ -27,6 +27,7 @@ import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
+import { Clipboard, Edit, Trash } from 'lucide-react';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -61,9 +62,9 @@ export default function PostCard({ post }) {
         }
     }
 
-    async function handleLike() {
+    async function toggleLike() {
         try {
-            const response = await axios.get(`${server_url}/posts/like/${post?._id}`, {
+            const response = await axios.get(`${server_url}/posts/${isLiked ? 'dislike' : 'like'}/${post?._id}`, {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
                 }
@@ -72,7 +73,7 @@ export default function PostCard({ post }) {
 
             if (data.status === 'success') {
                 setLikeCount(data.newLikeCount);
-                setIsLiked(true)
+                setIsLiked(!isLiked)
             }
             else {
                 toast.warn(data.message, toastConfig);
@@ -84,9 +85,28 @@ export default function PostCard({ post }) {
         }
     }
 
-    async function handleDislike() {
+    async function getSavedInclude() {
         try {
-            const response = await axios.get(`${server_url}/posts/dislike/${post?._id}`, {
+            const response = await axios.get(`${server_url}/posts/checkSaved/${post?._id}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                }
+            });
+            const data = response.data;
+
+            if (data.status === 'success')
+                setIsSaved(JSON.parse(data.message));
+            else
+                toast.warn(data.message, toastConfig);
+        } catch (e) {
+            console.log(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+    }
+
+    async function toggleSavePost() {
+        try {
+            const response = await axios.get(`${server_url}/posts/${isSaved ? 'deleteSavedPost' : 'savePost'}/${post?._id}`, {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
                 }
@@ -94,8 +114,7 @@ export default function PostCard({ post }) {
             const data = response.data;
 
             if (data.status === 'success') {
-                setLikeCount(data.newLikeCount);
-                setIsLiked(false)
+                setIsSaved(!isSaved);
             }
             else {
                 toast.warn(data.message, toastConfig);
@@ -107,8 +126,28 @@ export default function PostCard({ post }) {
         }
     }
 
-    const handleSave = () => {
-        setIsSaved(!isSaved)
+    function handleClipboard() {
+        if (!navigator.clipboard) {
+            console.log('Clipboard API not supported');
+            toast.error('Clipboard API not supported', toastConfig);
+            return;
+        }
+
+        try {
+            if (!post?._id) {
+                console.log('Post ID is not defined');
+                toast.error('No post found', toastConfig);
+                return;
+            }
+            const copyURL = `${window.location.origin}/post/${post?._id}`;
+            navigator.clipboard.writeText(copyURL);
+            console.log('Copied to clipboard');
+            toast.success('Copied to clipboard!', toastConfig);
+        }
+        catch (e) {
+            console.log(e.message);
+            toast.error('Error copying to clipboard', toastConfig);
+        }
     }
 
     async function handleDeletePost() {
@@ -142,7 +181,8 @@ export default function PostCard({ post }) {
         }
 
         getLikeInclude();
-        setLikeCount(post?.likeCount)
+        setLikeCount(post?.likeCount);
+        getSavedInclude();
     }, []);
 
 
@@ -177,27 +217,32 @@ export default function PostCard({ post }) {
                         </div>
                     </div>
 
-                    <div className='flex items-center gap-3 absolute right-5 '>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="outline"> ⚙️ </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                                <DropdownMenuGroup>
-                                    {globalUserID === post?.userID &&
-                                        <>
-                                            <DropdownMenuItem>
-                                                Edit
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={handleDeletePost}>
-                                                Delete
-                                            </DropdownMenuItem>
-                                        </>
-                                    }
-                                </DropdownMenuGroup>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
-                    </div>
+                    {globalUserID === post?.userID &&
+                        <div className='flex items-center gap-3 absolute right-5 '>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button variant="outline"> ⚙️ </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className={'bg-[#EEEEEE]'}>
+                                    <DropdownMenuGroup>
+                                        <DropdownMenuItem>
+                                            <Edit />
+                                            Edit
+                                        </DropdownMenuItem>
+                                        <DropdownMenuItem onClick={handleDeletePost}>
+                                            <Trash />
+                                            Delete
+                                        </DropdownMenuItem>
+                                        {/* <DropdownMenuItem>
+                                            <Clipboard />
+                                            Copy link
+                                        </DropdownMenuItem> */}
+                                    </DropdownMenuGroup>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+                        </div>
+                    }
+
 
                 </div>
             </div>
@@ -217,13 +262,13 @@ export default function PostCard({ post }) {
                 }
             </div>
             <div className="w-[90%] px-4 py-3 border-t border-[#616161] flex justify-between items-center">
-                <div className="flex space-x-4 gap-4">
+                <div className="flex space-x-4 gap-10">
                     <button
-                        className={`flex items-center space-x-1 ${isLiked ? 'text-[#FF3333]' : 'text-[#BDBDBD]'}`}
-                        onClick={isLiked ? handleDislike : handleLike}
+                        className='flex items-center space-x-1 text-[#BDBDBD]'
+                        onClick={toggleLike}
                     >
                         {isLiked ? (
-                            <FaHeart className="h-6 w-6" />
+                            <FaHeart className="h-6 w-6 text-[#FF3333]" />
                         ) : (
                             <FaRegHeart className="h-6 w-6" />
                         )}
@@ -231,25 +276,16 @@ export default function PostCard({ post }) {
                     </button>
 
                     <button
-                        className={`flex items-center space-x-1 ${isSaved ? 'text-[#FF3333]' : 'text-[#BDBDBD]'}`}
-                        onClick={handleSave}
+                        className='flex items-center space-x-1 text-[#BDBDBD]'
+                        onClick={toggleSavePost}
                     >
                         {isSaved ? (
-                            <FaBookmark className="h-6 w-6" />
+                            <FaBookmark className="h-6 w-6 text-[#FF3333]" />
                         ) : (
                             <FaRegBookmark className="h-6 w-6" />
                         )}
                         <span>{isSaved ? 'Saved' : 'Save'}</span>
                     </button>
-                    
-                    {/* <button className="flex items-center space-x-1 text-[#BDBDBD]">
-                        <FaRegComment className="h-6 w-6" />
-                        <span>Comment</span>
-                    </button>
-                    <button className="flex items-center space-x-1 text-[#BDBDBD]">
-                        <FaShareAlt className="h-6 w-6" />
-                        <span>Share</span>
-                    </button> */}
                 </div>
             </div>
         </div >

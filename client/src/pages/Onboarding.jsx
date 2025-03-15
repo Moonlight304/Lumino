@@ -77,7 +77,6 @@ export default function Onboarding() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-black text-white p-4">
-            <button onClick={() => console.log(formData)}> CLICK ME </button>
             <Card className="w-full max-w-2xl bg-gray-900 shadow-lg border border-red-500">
                 <CardHeader className="text-center">
                     <CardTitle className="text-4xl text-red-500">Welcome to Lumino</CardTitle>

@@ -131,7 +131,6 @@ router.get('/mark_notification/:notificationID', authMiddleware, async (req, res
                 message: 'User not found'
             })
 
-        console.log(user.notifications);
 
         user?.notifications?.forEach((notification) => {
             if (notification._id == notificationID) {
@@ -146,6 +145,51 @@ router.get('/mark_notification/:notificationID', authMiddleware, async (req, res
         return res.json({
             status: 'success',
             message: 'marked as read'
+        });
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: e.message + 'fa;fkad;fk;kj',
+        })
+    }
+})
+
+router.get('/delete_notification/:notificationID', authMiddleware, async (req, res) => {
+    const { userID } = req.user;
+    const { notificationID } = req.params;
+
+    try {
+        if (!userID || !notificationID)
+            return res.json({
+                status: 'fail',
+                message: 'Incomplete attributes'
+            })
+
+        const user = await User.findById(userID);
+
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'User not found'
+            })
+
+        await User.updateOne(
+            { _id: userID },
+            { $pull: { notifications: { _id: notificationID } } }
+        )
+
+        // user?.notifications?.forEach((notification) => {
+        //     if (notification._id == notificationID) {
+        //         notification.read = true;
+        //         return;
+        //     }
+        // })
+
+        return res.json({
+            status: 'success',
+            message: 'deleted notification'
+            
         });
     }
     catch (e) {

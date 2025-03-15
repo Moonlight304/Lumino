@@ -78,7 +78,7 @@ export default function NewPostCard({ setPosts }) {
                     />
                     :
                     <CgProfile
-                        className="w-16 h-16 rounded-full border-2 border-secondary object-cover mr-4"
+                        className="w-20 h-20 rounded-full object-cover mr-4"
                     />
                 }
 

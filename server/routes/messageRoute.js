@@ -97,16 +97,15 @@ router.get('/send_request/:senderID/:receiverID', authMiddleware, async (req, re
             }
         )
 
-        const notification = {
+        receiver.notifications.unshift({
             _id: new mongoose.mongo.ObjectId(),
             typeOfNotification: 'connection request',
             message: `${sender.display_name} is requesting to connect`,
             action_url: `/connections`,
-        };
-        receiver.notifications.unshift(notification);
+        });
 
 
-        await Promise.all([senderUpdate, receiverUpdate]);
+        await Promise.all([senderUpdate, receiverUpdate, receiver.save()]);
 
         return res.json({
             success: 'success',
@@ -150,7 +149,14 @@ router.get('/accept_request/:receiverID/:senderID', authMiddleware, async (req, 
             }
         )
 
-        await Promise.all([senderUpdate, receiverUpdate]);
+        sender.notifications.unshift({
+            _id: new mongoose.mongo.ObjectId(),
+            typeOfNotification: 'connection accepted',
+            message: `${receiver.display_name} accepted your request`,
+            action_url: `/connections`,
+        });
+
+        await Promise.all([senderUpdate, receiverUpdate, sender.save()]);
 
         return res.json({
             status: 'success',

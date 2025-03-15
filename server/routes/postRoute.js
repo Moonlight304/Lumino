@@ -398,6 +398,154 @@ router.get('/:postID/checkLiked', authMiddleware, async (req, res) => {
     }
 })
 
+router.get('/savePost/:postID', authMiddleware, async (req, res) => {
+    try {
+        const { postID } = req.params;
+        const { userID } = req.user;
 
+        if (!postID)
+            return res.json({
+                status: 'fail',
+                message: 'postID not found',
+            })
+
+        if (!userID)
+            return res.json({
+                status: 'fail',
+                message: 'userID not found',
+            })
+
+        const user = await User.findById(userID);
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'user not found',
+            })
+
+        if (user.savedPosts.includes(postID))
+            return res.json({
+                status: 'fail',
+                message: 'Already saved post',
+            })
+
+        await User.updateOne(
+            { _id: userID },
+            {
+                $push: { savedPosts: postID }
+            }
+        )
+
+        return res.json({
+            status: 'success',
+            message: 'post saved',
+        })
+    }
+    catch (e) {
+        res.json({
+            status: 'fail',
+            message: 'Error : ' + e,
+        })
+    }
+})
+
+router.get('/deleteSavedPost/:postID', authMiddleware, async (req, res) => {
+    try {
+        const { postID } = req.params;
+        const { userID } = req.user;
+
+        if (!postID)
+            return res.json({
+                status: 'fail',
+                message: 'postID not found',
+            })
+
+        if (!userID)
+            return res.json({
+                status: 'fail',
+                message: 'userID not found',
+            })
+
+        const user = await User.findById(userID);
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'user not found',
+            })
+
+        if (!user.savedPosts.includes(postID))
+            return res.json({
+                status: 'fail',
+                message: 'did not even save post',
+            })
+
+        await User.updateOne(
+            { _id: userID },
+            { $pull: { savedPosts: postID } }
+        )
+
+        return res.json({
+            status: 'success',
+            message: 'removed post from saved items',
+        })
+
+    }
+    catch (e) {
+        res.json({
+            status: 'fail',
+            message: 'Error : ' + e,
+        })
+    }
+})
+
+router.get('/checkSaved/:postID', authMiddleware, async (req, res) => {
+    try {
+        const { postID } = req.params;
+        const { userID } = req.user;
+
+        if (!postID)
+            return res.json({
+                status: 'fail',
+                message: 'postID not found',
+            })
+
+        if (!userID)
+            return res.json({
+                status: 'fail',
+                message: 'userID not found',
+            })
+
+        const post = await Post.findById(postID);
+        const user = await User.findById(userID);
+
+        if (!post)
+            return res.json({
+                status: 'fail',
+                message: 'Post not found',
+            })
+
+        if (!user)
+            return res.json({
+                status: 'fail',
+                messge: 'User not found'
+            })
+
+        if (user.savedPosts.includes(postID))
+            return res.json({
+                status: 'success',
+                message: JSON.stringify(true),
+            })
+        else
+            return res.json({
+                status: 'success',
+                message: JSON.stringify(false),
+            })
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: 'Error : ' + e,
+        })
+    }
+})
 
 module.exports = router;

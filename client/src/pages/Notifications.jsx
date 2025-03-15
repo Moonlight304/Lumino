@@ -63,6 +63,29 @@ export default function Notifications() {
         }
     }
 
+    async function handleDelete(notificationID) {
+        try {
+            const response = await axios.get(`${server_url}/users/delete_notification/${notificationID}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+                },
+            })
+            const data = response.data;
+
+            if (data.status === "success") {
+                console.log(data.message);
+                setNotifications((prev) => prev.filter(n => n._id !== notificationID));
+            }
+            else {
+                toast.error(data.message, toastConfig);
+            }
+        }
+        catch (e) {
+            toast.error("Oops.. an error occurred", toastConfig)
+            console.log(e.message);
+        }
+    }
+
     const navigate = useNavigate();
     useEffect(() => {
         if (!globalUserID) {
@@ -83,6 +106,7 @@ export default function Notifications() {
                             <h1> {notification?.message} </h1>
                             <Link to={notification?.action_url}> Go to  </Link>
                             <button onClick={() => handleRead(notification._id)}> Mark as read </button>
+                            <button onClick={() => handleDelete(notification._id)} > Delete </button>
                         </div>
                     ))
                 }
