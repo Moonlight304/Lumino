@@ -75,13 +75,13 @@ const userSchema = new mongoose.Schema({
     },
     playstyle: {
         type: String,
-        enum: ['Any', 'Casual', 'Competitive', ''],
+        enum: ['Any', 'Casual', 'Competitive', 'Mixed', ''],
         default: '',
     },
     communication_preference: {
         type: String,
         default: '',
-        enum: ['Any', 'Voice', 'Text','Both', ''],
+        enum: ['Any', 'Voice', 'Text', 'Both', ''],
     },
     discord_username: {
         type: String,

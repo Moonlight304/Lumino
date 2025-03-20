@@ -13,7 +13,7 @@ import { userIDState } from "../configs/atoms";
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function UserCard({ user }) {
+export default function UserCard({ user, setUsers }) {
     const [globalUserID] = useRecoilState(userIDState);
 
     async function handleRequest() {
@@ -27,6 +27,7 @@ export default function UserCard({ user }) {
 
             if (data.success) {
                 toast.success(data.message, toastConfig);
+                setUsers((prev) => prev.filter((u) => u._id !== user?._id));
             }
             else {
                 toast.error(data.message, toastConfig);
@@ -39,7 +40,7 @@ export default function UserCard({ user }) {
     }
 
     return (
-        <div className="bg-gray-900 border-2 border-secondary rounded-lg shadow-md w-[32%] h-fit">
+        <div className="bg-gray-900 border-2 border-secondary rounded-lg shadow-md w-full sm:w-[48%] lg:w-[32%] h-fit">
             <div className="p-6">
                 <div className="flex items-center mb-4">
                     {user?.profile_picture ? (
