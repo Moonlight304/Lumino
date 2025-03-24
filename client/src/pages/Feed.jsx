@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 
 
 import toastConfig from '../configs/toastConfig';

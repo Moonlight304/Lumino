@@ -6,7 +6,7 @@ import Navbar from "../components/Navbar"
 import { useRecoilState } from "recoil"
 import { userIDState } from "@/configs/atoms"
 import { Link, useNavigate } from "react-router-dom"
-import { toast } from "react-toastify"
+import { toast } from 'react-hot-toast'
 import toastConfig from "@/configs/toastConfig"
 import { Bell, Check, ExternalLink, Loader2, Trash2 } from "lucide-react"
 

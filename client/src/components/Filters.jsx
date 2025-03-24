@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useRecoilState } from "recoil"
 import axios from "axios"
-import { toast } from "react-toastify"
+import { toast } from 'react-hot-toast'
 
 import { userIDState } from "../configs/atoms"
 import toastConfig from "../configs/toastConfig"
@@ -39,7 +39,8 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
 
     const applyFilters = () => {
         const filterParams = new URLSearchParams(filters).toString()
-        fetchUsers(filterParams)
+        fetchUsers(filterParams);
+        toast.success('Applied filters', toastConfig);
     }
 
     return (

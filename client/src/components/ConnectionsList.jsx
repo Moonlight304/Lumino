@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { useRecoilState } from 'recoil';
 
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
 import { userIDState } from '../configs/atoms';

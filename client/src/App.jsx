@@ -9,6 +9,8 @@ import Feed from './pages/Feed';
 import Notifications from './pages/Notifications';
 import Connections from './pages/Connections';
 import Call from './pages/Call';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 export default function App() {
     return (
@@ -16,6 +18,8 @@ export default function App() {
             <Routes>
                 <Route path='/' element={<Landing />} />
                 <Route path='/auth' element={<Auth />} />
+                <Route path='/forgot-password' element={<ForgotPassword />} />
+                <Route path='/reset-password' element={<ResetPassword />} />
                 <Route path='/onboarding' element={<Onboarding />} />
                 <Route path='/discover' element={<Discover />} />
                 <Route path='/feed' element={<Feed />} />

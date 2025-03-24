@@ -1,15 +1,10 @@
-import { Slide } from 'react-toastify';
 
 const toastConfig = {
-    position: "top-center",
-    autoClose: 1000,
-    hideProgressBar: false,
-    closeOnClick: false,
-    pauseOnHover: false,
-    draggable: true,
-    progress: undefined,
-    theme: "dark",
-    transition: Slide,
+    style: {
+        borderRadius: '10px',
+        background: '#333',
+        color: '#fff',
+    },
 }
 
 export default toastConfig;

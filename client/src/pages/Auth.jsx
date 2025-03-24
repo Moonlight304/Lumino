@@ -4,7 +4,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
 import { userIDState, displayNameState, avatarURLState } from '../configs/atoms';
@@ -100,18 +100,18 @@ export default function Auth() {
     return (
         <div className="min-h-screen bg-[#0A0A0A] flex flex-col justify-center items-center p-4">
             <div className="text-4xl font-bold text-primary mb-8"> <Link to={'/'}> Lumino </Link> </div>
-            <div className="bg-gray-900 bg-opacity-50 p-8 rounded-lg w-full max-w-md">
+            <div className="bg-gray-900 bg-opacity-50 p-8 max-md:px-4 max-md:py-6 rounded-lg w-full max-w-md">
                 <h2 className="text-2xl font-bold text-white mb-6 text-center"> {isLogin ? 'Welcome Back' : 'Join Lumino'}  </h2>
                 <form className="space-y-4" onSubmit={handleAuthorisation}>
                     {
                         !isLogin &&
-                        <div>
+                        <div className='max-md:w-full'>
                             <label htmlFor="displayName" className="block text-white mb-1">Display Name</label>
                             <input
                                 type="text"
                                 id="displayName"
                                 name='display_name'
-                                className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-primary"
+                                className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded py-2 focus:outline-none focus:border-primary"
                                 value={formData.display_name}
                                 onChange={handleChange}
                                 required

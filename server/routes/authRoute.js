@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
+const dotenv = require('dotenv').config();
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
+const nodemailer = require('nodemailer');
 
 const JWT_SECRET = process.env.JWT_SECRET_CODE;
 
@@ -108,12 +110,94 @@ router.post('/login', async (req, res) => {
         })
     }
     catch (e) {
+        console.log(error.message);
         return res.json({
             status: 'fail',
             message: e.message,
         })
     }
 })
+
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS
+    }
+});
+
+router.post('/forgot-password', async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await User.findOne({ email });
+
+        if (!user)
+            return res.status(404).json({
+                status: "fail",
+                message: "User not found"
+            });
+
+        const token = jwt.sign({
+            email: user.email
+        }, JWT_SECRET, { expiresIn: "15m" });
+
+        const resetLink = `${process.env.client_url}/reset-password?token=${token}`;
+
+        await transporter.sendMail({
+            from: process.env.EMAIL_USER,
+            to: user.email,
+            subject: "Lumino Password Reset",
+            text: `Click the link to reset your password: ${resetLink}`
+        });
+
+        return res.json({
+            status: "success",
+            message: "Reset link sent to email",
+            email: user.email
+        });
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: e.message,
+        })
+    }
+});
+
+router.post("/reset-password", async (req, res) => {
+    const { token, password } = req.body;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        const user = await User.findOne({ email: decoded.email });
+
+        if (!user)
+            return res.status(400).json({
+                status: "fail",
+                message: "Invalid token"
+            });
+
+        // Hash new password
+        const salt = await bcrypt.genSalt();
+        const newPasswordHash = await bcrypt.hash(password, salt);
+        
+        user.passwordHash = newPasswordHash;
+        await user.save();
+
+        return res.json({
+            status: "success",
+            message: "Password reset successful"
+        });
+    }
+    catch (error) {
+        console.log(error.message);
+        return res.status(400).json({
+            status: "fail",
+            message: "Invalid or expired token"
+        });
+    }
+});
+
 
 router.post('/onboarding', authMiddleware, async (req, res) => {
     const { userID } = req.user;

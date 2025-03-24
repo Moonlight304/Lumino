@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
 const cloud_name = import.meta.env.VITE_cloud_name;

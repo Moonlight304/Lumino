@@ -1,5 +1,5 @@
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import toastConfig from "../configs/toastConfig";
 
 const server_url = import.meta.env.VITE_server_url;

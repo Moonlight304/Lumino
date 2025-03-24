@@ -5,7 +5,7 @@ import { CgProfile } from 'react-icons/cg';
 import { FiPaperclip } from 'react-icons/fi';
 import { FaImage } from "react-icons/fa6";
 
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
 import { useRecoilState } from 'recoil';

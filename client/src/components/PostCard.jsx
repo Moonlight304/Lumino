@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 import { Link } from 'react-router-dom';
-import { toast } from 'react-toastify'
+import { toast } from 'react-hot-toast'
 import toastConfig from '../configs/toastConfig'
 import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';

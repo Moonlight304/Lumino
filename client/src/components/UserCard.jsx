@@ -3,7 +3,7 @@ import { CgProfile } from "react-icons/cg";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 import { FaGamepad, FaComments, FaMicrophoneAlt } from "react-icons/fa";
 
-import { toast } from "react-toastify";
+import { toast } from 'react-hot-toast';
 import toastConfig from "../configs/toastConfig";
 
 import { useRecoilState } from "recoil";
@@ -50,7 +50,7 @@ export default function UserCard({ user, setUsers }) {
                             alt={user.display_name}
                         />
                     ) : (
-                        <CgProfile className="w-28 h-28 rounded-full border-2 border-secondary object-cover mr-4" />
+                        <CgProfile className="min-w-20 min-h-20 rounded-full border-2 border-secondary object-cover mr-4" />
                     )}
                     <div>
                         <h2 className="text-xl font-semibold text-gray-300 dark:text-white">{user?.display_name}</h2>
