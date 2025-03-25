@@ -109,13 +109,6 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
                     </SelectContent>
                 </Select>
 
-                {/* <Input id="country" name="country" value={filters.country} onChange={handleFilterChange} placeholder="Enter country" className="bg-gray-800 text-white border-red-500" /> */}
-
-                {/* <button onClick={() => console.log(ageLimit)}> CLICK ME </button> <br />
-                                <button onClick={() => console.log(filters)}> CLICK ME </button> */}
-                {/* <Input id="age" name="age" value={filters.age} onChange={handleFilterChange} placeholder="Enter age" className="bg-gray-800 text-white border-red-500" /> */}
-
-
                 <Select value={filters.gender} onValueChange={(value) => handleSelectChange("gender", value)} >
                     <SelectTrigger className='bg-gray-800 text-white border-red-500'>
                         <SelectValue placeholder="Select gender" />
@@ -155,7 +148,7 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
                         <SelectItem value="PC">PC</SelectItem>
                         <SelectItem value="PlayStation">PlayStation</SelectItem>
                         <SelectItem value="Xbox">Xbox</SelectItem>
-                        <SelectItem value="Android">className="text-white"</SelectItem>
+                        <SelectItem value="Android">Android</SelectItem>
                         <SelectItem value="IOS">IOS</SelectItem>
                     </SelectContent>
                 </Select>
