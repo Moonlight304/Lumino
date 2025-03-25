@@ -15,6 +15,7 @@ import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
 import { FaDiscord, FaSteam } from 'react-icons/fa';
 import { BsFillPersonPlusFill } from 'react-icons/bs';
+import { CgProfile } from 'react-icons/cg';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -136,10 +137,16 @@ export default function UserPage() {
                 <Card className="w-full bg-gray-900 border-red-600">
                     <CardHeader className="flex flex-row max-md:flex-col items-center justify-center gap-8">
                         <Avatar className="h-40 w-40 border-4 border-red-500">
-                            <AvatarImage
-                                src={user.profile_picture}
-                                alt={`${user.display_name}'s profile`}
-                            />
+                            {
+                                user?.profile_picture
+                                    ?
+                                    <AvatarImage
+                                        src={user.profile_picture || <CgProfile />}
+                                        alt={`${user.display_name}'s profile`}
+                                    />
+                                    :
+                                    <CgProfile className="w-full h-full text-white rounded-full object-cover" />
+                            }
                         </Avatar>
 
                         <div className="text-center flex space-x-5">
@@ -151,32 +158,37 @@ export default function UserPage() {
                                     {user.connectedIDs.length} Connections
                                 </CardTitle>
 
-                                <div className='flex justify-center'>
-                                    {globalUserID !== user._id &&
-                                        connectionStatus === 'Connected'
-                                        ?
-                                        <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
-                                            Connected
-                                        </button>
-                                        :
-                                        connectionStatus === 'Sent'
-                                            ?
-                                            <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
-                                                Request Sent
-                                            </button>
-                                            :
-                                            connectionStatus === 'Accept'
-                                                ?
-                                                <button onClick={handleAccept} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
-                                                    Accept
-                                                </button>
-                                                :
-                                                <button onClick={handleRequest} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
-                                                    <BsFillPersonPlusFill className="mr-2" />
-                                                    Connect
-                                                </button>
-                                    }
-                                </div>
+                                {globalUserID && user?._id && globalUserID !== user._id &&
+                                    (
+                                        <div className='flex justify-center'>
+
+                                            {
+                                                connectionStatus === 'Connected'
+                                                    ?
+                                                    <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
+                                                        Connected
+                                                    </button>
+                                                    :
+                                                    connectionStatus === 'Sent'
+                                                        ?
+                                                        <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
+                                                            Request Sent
+                                                        </button>
+                                                        :
+                                                        connectionStatus === 'Accept'
+                                                            ?
+                                                            <button onClick={handleAccept} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
+                                                                Accept
+                                                            </button>
+                                                            :
+                                                            <button onClick={handleRequest} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
+                                                                <BsFillPersonPlusFill className="mr-2" />
+                                                                Connect
+                                                            </button>
+                                            }
+                                        </div>
+                                    )
+                                }
                             </div>
 
                             {globalUserID === user._id &&

@@ -31,6 +31,7 @@ export default function Auth() {
     useEffect(() => {
         if (globalUserID) {
             navigate('/discover');
+            toast.error('Cannot access page', toastConfig);
         }
     }, []);
 

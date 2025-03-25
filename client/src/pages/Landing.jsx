@@ -13,6 +13,8 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '../configs/atoms';
 import { motion, AnimatePresence } from 'framer-motion';
+import toastConfig from '@/configs/toastConfig';
+import toast from 'react-hot-toast';
 
 // Memoized Background Component to reduce re-renders
 const GamingBackground = React.memo(() => {
@@ -107,7 +109,8 @@ export default function Landing() {
 
     useEffect(() => {
         if (globalUserID) {
-            navigate('/');
+            navigate('/discover');
+            toast.error('Cannot access page', toastConfig);
         }
 
         // Responsive check
