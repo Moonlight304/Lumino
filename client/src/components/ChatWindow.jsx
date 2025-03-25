@@ -7,6 +7,14 @@ import { FaImage } from "react-icons/fa6";
 
 import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 
 import { useRecoilState } from 'recoil';
 
@@ -131,7 +139,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                 ) : (
                                     <CgProfile className="w-10 h-10 text-blue-500 mr-4" />
                                 )}
-                                <h2 onClick={() => navigate(`/user/${remoteUser?.display_name}`)} className="text-xl font-semibold">{remoteUser?.display_name}</h2>
+                                <h2 onClick={() => navigate(`/user/${remoteUser?.display_name}`)} className="text-xl font-semibold cursor-pointer">{remoteUser?.display_name}</h2>
                             </div>
 
                             <div>
@@ -172,11 +180,24 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                         {message?.text ? (
                                             <p className="whitespace-normal break-words">{message.text}</p>
                                         ) : message?.image ? (
-                                            <img
-                                                src={message?.image}
-                                                alt="Shared image"
-                                                className="max-w-full h-auto rounded-lg"
-                                            />
+                                            <Dialog>
+                                                <DialogTrigger asChild>
+                                                    <div className="relative w-full border-2 border-[#999999] rounded-lg cursor-pointer">
+                                                        <img
+                                                            src={message?.image}
+                                                            alt="Shared image"
+                                                            className="max-w-full h-fit rounded-lg bg-green-400 cursor-pointer"
+                                                        />
+                                                    </div>
+                                                </DialogTrigger>
+                                                <DialogContent className="w-[90vw] h-[90vh] max-w-none max-h-none flex items-center justify-center bg-black/80 p-0">
+                                                    <img
+                                                        src={message?.image}
+                                                        alt="Post image"
+                                                        className='max-w-full max-h-full'
+                                                    />
+                                                </DialogContent>
+                                            </Dialog>
                                         ) : (
                                             <FaImage className="w-auto h-[10rem] ps-1 pe-1" />
                                         )}

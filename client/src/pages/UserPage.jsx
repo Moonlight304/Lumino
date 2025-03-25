@@ -16,6 +16,7 @@ import { userIDState } from '@/configs/atoms';
 import { FaDiscord, FaSteam } from 'react-icons/fa';
 import { BsFillPersonPlusFill } from 'react-icons/bs';
 import { CgProfile } from 'react-icons/cg';
+import Loading from '@/components/Loading';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -128,7 +129,7 @@ export default function UserPage() {
         getUser();
     }, [display_name]);
 
-    if (isLoading) return <p className="text-white text-center">Loading...</p>;
+    if (isLoading) return <Loading message={'Getting latest user info...'} />
     if (!user) return <p className="text-white text-center">User not found.</p>;
 
     return (
@@ -143,6 +144,7 @@ export default function UserPage() {
                                     <AvatarImage
                                         src={user.profile_picture || <CgProfile />}
                                         alt={`${user.display_name}'s profile`}
+                                        className={'object-cover'}
                                     />
                                     :
                                     <CgProfile className="w-full h-full text-white rounded-full object-cover" />
@@ -259,30 +261,44 @@ export default function UserPage() {
                     </CardContent>
                 </Card>
 
-                {globalUserID === user._id &&
-                    <div className='flex flex-col justify-center items-center mt-5'>
-                        <div className='flex gap-4'>
-                            <Button className={'bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white'} onClick={() => setDisplayedPosts(posts)}> My Posts </Button>
-                            <Button className={'bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white'} onClick={() => setDisplayedPosts(savedPosts)}> Saved Posts </Button>
+                {globalUserID === user._id && (
+                    <div className="flex flex-col justify-center items-center mt-5 w-full">
+                        {/* Buttons */}
+                        <div className="flex gap-4">
+                            <Button
+                                className={`border-2 px-4 py-2 rounded-lg transition duration-300 ease-in-out ${displayedPosts === posts
+                                    ? "bg-red-600 text-white border-red-800"
+                                    : "bg-black text-red-500 border-red-800 hover:bg-red-600 hover:text-white"
+                                    }`}
+                                onClick={() => setDisplayedPosts(posts)}
+                            >
+                                My Posts
+                            </Button>
+                            <Button
+                                className={`border-2 px-4 py-2 rounded-lg transition duration-300 ease-in-out ${displayedPosts === savedPosts
+                                    ? "bg-red-600 text-white border-red-800"
+                                    : "bg-black text-red-500 border-red-800 hover:bg-red-600 hover:text-white"
+                                    }`}
+                                onClick={() => setDisplayedPosts(savedPosts)}
+                            >
+                                Saved Posts
+                            </Button>
                         </div>
 
-                        {displayedPosts.length > 0
-                            ?
-                            displayedPosts.map((post, index) => {
-                                return (
-                                    <PostCard
-                                        key={index}
-                                        post={post}
-                                        setPosts={setDisplayedPosts}
-                                    />
-                                );
-                            })
-                            : (
-                                <h1>No posts available</h1>
-                            )
-                        }
+                        {/* Posts Section */}
+                        <div className="w-full mt-5 flex flex-col justify-center items-center">
+                            {displayedPosts.length > 0 ? (
+                                displayedPosts.map((post, index) => (
+                                    <PostCard key={index} post={post} setPosts={setDisplayedPosts} />
+                                ))
+                            ) : (
+                                <div className='flex justify-center items-center'>
+                                    <h1 className="text-gray-400 text-lg mt-5 italic">No posts available</h1>
+                                </div>
+                            )}
+                        </div>
                     </div>
-                }
+                )}
             </div>
         </>
     );
