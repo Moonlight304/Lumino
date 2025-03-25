@@ -40,8 +40,9 @@ export default function Connections() {
     useEffect(() => {
         if (!globalUserID) {
             navigate('/');
+            toast.error('Cannot access page', toastConfig);
         }
-    }, []);
+    }, [globalUserID]);
 
     return (
         <div className="bg-background min-h-fit text-white">

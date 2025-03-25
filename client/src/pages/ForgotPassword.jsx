@@ -31,6 +31,13 @@ export default function ForgotPassword() {
         }
     }
 
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (globalUserID) {
+            navigate('/');
+            toast.error('Cannot access page', toastConfig);
+        }
+    }, [globalUserID]);
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] flex flex-col justify-center items-center p-4">

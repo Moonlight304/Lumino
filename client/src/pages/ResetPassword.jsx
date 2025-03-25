@@ -1,16 +1,27 @@
+import { userIDState } from "@/configs/atoms";
 import toastConfig from "@/configs/toastConfig";
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
+import { useRecoilState } from "recoil";
 
 const server_url = import.meta.env.VITE_server_url;
 
 export default function ResetPassword() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    
+    const [globalUserID] = useRecoilState(userIDState);
     const token = new URLSearchParams(window.location.search).get("token");
+
+    useEffect(() => {
+        if (globalUserID || !token || token === '') {
+            navigate('/');
+            toast.error('Cannot access page', toastConfig);
+        }
+    }, [globalUserID]);
 
     const [formData, setFormData] = useState({
         password: '',
@@ -52,6 +63,7 @@ export default function ResetPassword() {
             toast.error('Oops try again', toastConfig);
         }
     }
+
 
 
     return (

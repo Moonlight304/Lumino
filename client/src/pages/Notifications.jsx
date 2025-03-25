@@ -86,14 +86,13 @@ export default function Notifications() {
         }
     }
 
-    const navigate = useNavigate()
+    const navigate = useNavigate();
     useEffect(() => {
         if (!globalUserID) {
-            navigate("/")
+            navigate('/');
+            toast.error('Cannot access page', toastConfig);
         }
-
-        fetchNotifications()
-    }, [globalUserID, navigate])
+    }, [globalUserID]);
 
     return (
         <>

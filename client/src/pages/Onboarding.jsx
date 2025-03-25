@@ -40,10 +40,12 @@ export default function Onboarding() {
     });
 
     const navigate = useNavigate();
-
     useEffect(() => {
-        if (!globalUserID) navigate("/");
-    }, [globalUserID, navigate]);
+        if (!globalUserID) {
+            navigate('/');
+            toast.error('Cannot access page', toastConfig);
+        }
+    }, [globalUserID]);
 
     function handleChange(e) {
         const { name, value } = e.target;

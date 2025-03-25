@@ -50,8 +50,8 @@ export default function Feed() {
     useEffect(() => {
         if (!globalUserID) {
             navigate('/');
+            toast.error('Cannot access page', toastConfig);
         }
-        getPosts();
     }, [globalUserID]);
 
     return (

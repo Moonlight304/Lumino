@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Navbar from '../components/Navbar';
 import { socketConnection } from '../configs/socketConnection';
 import peer from '../configs/peer';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '../configs/atoms';
 
@@ -107,6 +107,14 @@ export default function Call() {
             }
         };
     }, [globalUserID]);
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!globalUserID) {
+            navigate("/")
+            toast.error('Cannot access page', toastConfig);
+        }
+    }, [globalUserID, navigate])
 
     return (
         <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">

@@ -129,6 +129,13 @@ export default function UserPage() {
         getUser();
     }, [display_name]);
 
+    useEffect(() => {
+        if (!globalUserID) {
+            navigate('/');
+            toast.error('Cannot access page');
+        }
+    }, []);
+
     if (isLoading) return <Loading message={'Getting latest user info...'} />
     if (!user) return <p className="text-white text-center">User not found.</p>;
 

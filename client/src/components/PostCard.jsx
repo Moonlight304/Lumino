@@ -129,6 +129,7 @@ export default function PostCard({ post, setPosts }) {
             const data = response.data;
 
             if (data.status === 'success') {
+                toast.success(isSaved ? 'Removed from saved post' : 'Saved post', toastConfig);
                 setIsSaved(!isSaved);
             }
             else {

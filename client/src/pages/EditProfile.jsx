@@ -17,6 +17,7 @@ import { useRecoilState } from 'recoil';
 import { displayNameState, userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
 import handleFileChange from '@/helpers/handleFileChange';
+import { useNavigate } from 'react-router-dom';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -104,6 +105,14 @@ export default function EditProfile({ onProfileUpdate }) {
             toast.error('Failed to update profile', toastConfig);
         }
     };
+
+    const navigate = useNavigate();
+    useEffect(() => {
+        if (!globalUserID) {
+            navigate('/');
+            toast.error('Cannot access page', toastConfig);
+        }
+    }, [globalUserID]);
 
     return (
         <>

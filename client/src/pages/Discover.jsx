@@ -72,7 +72,8 @@ export default function Discover() {
 
     useEffect(() => {
         if (!globalUserID) {
-            navigate("/")
+            navigate("/");
+            toast.error('Cannot access page', toastConfig);
         }
         fetchUsers("")
     }, [globalUserID, navigate])
