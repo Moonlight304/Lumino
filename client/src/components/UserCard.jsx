@@ -40,7 +40,7 @@ export default function UserCard({ user, setUsers }) {
     }
 
     return (
-        <div className="bg-gray-900 border-2 border-secondary rounded-lg shadow-md w-full sm:w-[48%] lg:w-[32%] h-fit">
+        <div className="bg-gray-900 border-2 border-red-500 rounded-lg shadow-md w-full ">
             <div className="p-6">
                 <div className="flex items-center mb-4">
                     {user?.profile_picture ? (
@@ -100,9 +100,8 @@ export default function UserCard({ user, setUsers }) {
                     )}
                 </div>
             </div>
-
             <div className="px-6 pb-6">
-                <button onClick={handleRequest} className="w-full bg-primary hover:bg-opacity-70 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out flex items-center justify-center">
+                <button onClick={handleRequest} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out w-full py-2 px-4 rounded-lg flex items-center justify-center">
                     <BsFillPersonPlusFill className="mr-2" />
                     Connect
                 </button>

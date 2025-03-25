@@ -82,7 +82,7 @@ export default function Onboarding() {
                     <CardTitle className="text-4xl text-red-500">Welcome to Lumino</CardTitle>
                     <p className="text-lg text-gray-400">Let&apos;s set up your profile, {globalDisplayName}</p>
                 </CardHeader>
-                <CardContent>
+                <CardContent className={'max-md:px-2'}>
                     <form onSubmit={handleOnboarding} className="space-y-6">
                         {/* Profile Picture */}
                         <div className="flex flex-col items-center space-y-4">
@@ -90,7 +90,7 @@ export default function Onboarding() {
                             <label htmlFor="profile_picture" className="cursor-pointer">
 
                                 {formData.profile_picture ? (
-                                    <div className="relative w-36 h-36 rounded-full border-4 border-dashed border-red-500 flex items-center justify-center">
+                                    <div className="relative w-36 h-36 rounded-full border-4 border-red-500 flex items-center justify-center">
                                         <img src={formData.profile_picture} alt="Profile" className="w-full h-full rounded-full object-cover" />
 
                                         <button
@@ -102,7 +102,7 @@ export default function Onboarding() {
                                     </div>
 
                                 ) : (
-                                    <div className="w-32 h-32 rounded-full border-4 border-dashed border-red-500 flex items-center justify-center">
+                                    <div className="w-32 h-32 rounded-full border-4 border-red-500 flex items-center justify-center">
                                         <CgProfile className="w-20 h-20 text-red-500" />
                                     </div>
                                 )}
@@ -127,7 +127,7 @@ export default function Onboarding() {
                         </div>
 
                         {/* Age & Gender */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             <div>
                                 <Label htmlFor="age" className="text-white">Age</Label>
                                 <Input type="number" id="age" name="age" placeholder="Enter your age" value={formData.age} onChange={handleChange} className="bg-gray-800 border-red-500 text-white" />
@@ -150,7 +150,7 @@ export default function Onboarding() {
                         </div>
 
                         {/* communication_pref & country */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             <div>
                                 <Label htmlFor="communication_preference" className="text-white">Communication Preference</Label>
                                 <Select
@@ -187,7 +187,7 @@ export default function Onboarding() {
                         </div>
 
                         {/* platform & playstyle */}
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             <div>
                                 <Label htmlFor="platform" className="text-white">Platform</Label>
                                 <Select value={formData.platform} onValueChange={(value) => setFormData((prev) => ({ ...prev, platform: value }))}>

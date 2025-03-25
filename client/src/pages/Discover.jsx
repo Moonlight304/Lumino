@@ -80,7 +80,7 @@ export default function Discover() {
         <div className="min-h-screen bg-background text-white">
             <Navbar />
 
-            <main className="container mx-auto px-4 py-8">
+            <main className="w-full px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-6">
                     <Drawer className="text-white">
                         <DrawerTrigger asChild className="md:hidden">
@@ -130,9 +130,9 @@ export default function Discover() {
                                 </p>
                             </div>
                         ) : (
-                            <div className='flex flex-wrap w-full gap-5 overflow-clip'>
+                            <div className='grid gap-5 grid-cols-4 max-2xl:grid-cols-3 max-xl:gap-2 max-lg:grid-cols-2 max-md:grid-cols-1 w-full overflow-clip'>
                                 {users.map((user) => (
-                                    <UserCard key={user._id} user={user} users={users} setUsers={setUsers} className="border-red-500 bg-gray-900" />
+                                    <UserCard key={user._id} user={user} users={users} setUsers={setUsers} />
                                 ))}
                             </div>
                         )}

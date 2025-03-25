@@ -116,7 +116,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
 
     return (
         <div className="w-full md:w-2/3 h-full">
-            <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
+            <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
                 {remoteUser ? (
                     <>
                         {/* Chat Header */}

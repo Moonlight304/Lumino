@@ -25,6 +25,7 @@ import {
 import handleFileChange from "@/helpers/handleFileChange";
 import { toast } from 'react-hot-toast';
 import toastConfig from "@/configs/toastConfig";
+import { Trash2 } from "lucide-react";
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -95,7 +96,7 @@ export default function NewPostCard({ setPosts }) {
             </div>
 
             {imageURL &&
-                <div className="relative">
+                <div className="relative group">
                     <img
                         src={imageURL}
                         alt="posted_image"
@@ -104,9 +105,10 @@ export default function NewPostCard({ setPosts }) {
 
                     <span
                         onClick={() => setImageURL('')}
-                        className="absolute right-5 top-5"
-                    > ❌ </span>
+                        className="absolute right-6 top-6 hidden bg-[#000000A0] hover:bg-[#000000E0] p-2 rounded-full group-hover:block cursor-pointer"
+                    > <Trash2 /> </span>
                 </div>
+
             }
 
             <div className="w-[95%] flex justify-between px-4 border-t-2 border-[#999999] pt-2">
@@ -159,7 +161,7 @@ export default function NewPostCard({ setPosts }) {
                     </div>
 
                     <div onClick={handleNewPost}>
-                        <Button> Post </Button>
+                        <Button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"> Post </Button>
                     </div>
                 </div>
             </div>

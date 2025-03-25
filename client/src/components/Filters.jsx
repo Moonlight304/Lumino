@@ -53,7 +53,7 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
                 <Button
                     variant="outline"
                     size="sm"
-                    className="border-red-500 text-red-500 hover:bg-red-500 hover:text-white"
+                    className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"
                     onClick={() => {
                         setFilters({
                             country: "",
@@ -189,7 +189,7 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
 
                 <Button
                     onClick={applyFilters}
-                    className="w-full mt-6 bg-red-600 hover:bg-red-700"
+                    className="w-full mt-6 bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out"
                 >Apply Filters</Button>
             </div>
         </>

@@ -19,7 +19,14 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+} from "@/components/ui/dialog"
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast'
 import toastConfig from '../configs/toastConfig'
@@ -248,18 +255,28 @@ export default function PostCard({ post }) {
             </div>
             <div className="px-4 py-2 space-y-4 w-full">
                 <p className="text-[#BDBDBD] w-full break-all whitespace-pre-wrap"> {post?.body.trim()} </p>
-                {post?.imageURL &&
-                    (
-                        <div className="relative w-full pt-[56.25%] border-2 border-[#999999] rounded-lg">
-                            <img
-                                src={post?.imageURL}
-                                alt="Post image"
-                                className="absolute inset-0 w-full h-full object-cover rounded-md"
-                            />
-                        </div>
-                    )
-
-                }
+                <Dialog>
+                    {post?.imageURL &&
+                        (
+                            <DialogTrigger asChild>
+                                <div className="relative w-full pt-[56.25%] border-2 border-[#999999] rounded-lg cursor-pointer">
+                                    <img
+                                        src={post?.imageURL}
+                                        alt="Post image"
+                                        className="absolute inset-0 w-full h-full object-cover rounded-md"
+                                    />
+                                </div>
+                            </DialogTrigger>
+                        )
+                    }
+                    <DialogContent className="w-[90vw] h-[90vh] max-w-none max-h-none flex items-center justify-center bg-black/80 p-0">
+                        <img
+                            src={post?.imageURL}
+                            alt="Post image"
+                            className='max-w-full max-h-full'
+                        />
+                    </DialogContent>
+                </Dialog>
             </div>
             <div className="w-[90%] px-4 py-3 border-t border-[#616161] flex justify-between items-center">
                 <div className="flex space-x-4 gap-10">

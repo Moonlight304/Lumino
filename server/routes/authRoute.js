@@ -233,6 +233,7 @@ router.post('/onboarding', authMiddleware, async (req, res) => {
         return res.status(200).json({
             status: 'success',
             message: 'Profile updated successfully',
+            profile_picture: user.profile_picture
         });
     }
     catch (e) {

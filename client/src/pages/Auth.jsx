@@ -111,7 +111,7 @@ export default function Auth() {
                                 type="text"
                                 id="displayName"
                                 name='display_name'
-                                className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded py-2 focus:outline-none focus:border-primary"
+                                className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-3 py-2 focus:outline-none focus:border-primary"
                                 value={formData.display_name}
                                 onChange={handleChange}
                                 required

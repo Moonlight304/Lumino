@@ -18,7 +18,7 @@ export default function Navbar() {
                 sessionStorage.removeItem('jwt_token');
                 setGlobalUserID(null);
 
-                navigate('/auth');
+                // navigate('/');
             }}> Logout </button>
 
             <nav className="hidden md:block">
