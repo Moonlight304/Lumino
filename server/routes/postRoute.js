@@ -11,21 +11,21 @@ router.get('/', authMiddleware, async (req, res) => {
         const { userID } = req.user;
 
         const user = await User.findById(userID);
-        if (!user) 
+        if (!user)
             return res.json({
                 status: 'fail',
                 message: 'User not found'
             })
 
 
-            const allPosts = await Post.find({
-                $or: [
-                    { userID: userID },
-                    { visibility: 'everyone' },
-                    { visibility: 'connections', userID: { $in: user.connectedIDs } }
-                ]
-            }).sort({ createdAt: -1 });
-            
+        const allPosts = await Post.find({
+            $or: [
+                { userID: userID },
+                { visibility: 'everyone' },
+                { visibility: 'connections', userID: { $in: user.connectedIDs } }
+            ]
+        }).sort({ createdAt: -1 });
+
 
         return res.json({
             status: 'success',
@@ -140,21 +140,13 @@ router.post('/edit_post/:postID', authMiddleware, async (req, res) => {
     try {
         const { userID } = req.user;
         const { postID } = req.params;
-        const { newHeading, newBody, newImageURL } = req.body;
-
-        if (!newHeading || !newBody) {
-            return res.json({
-                status: 'fail',
-                message: 'Incomplete Data',
-            })
-        }
+        const { body, imageURL, visibility } = req.body;
 
         if (!postID)
             return res.json({
                 status: 'fail',
                 message: 'postID is required',
             })
-
         const post = await Post.findById(postID);
 
         if (!post)
@@ -163,21 +155,26 @@ router.post('/edit_post/:postID', authMiddleware, async (req, res) => {
                 message: 'post not found',
             })
 
+
+        if (!body || !visibility) {
+            return res.json({
+                status: 'fail',
+                message: 'Incomplete Data',
+            })
+        }
+
+
         if (userID !== post.userID._id.toString())
             return res.json({
                 status: 'fail',
                 message: 'cannot edit others posts',
             });
-
-
-        post.heading = newHeading;
-        post.body = newBody;
-
-        if (newImageURL !== post.imageURL) {
-            post.imageURL = newImageURL;
-        }
-
-        await post.save();
+            
+        
+        await Post.findByIdAndUpdate(
+            postID,
+            { body, imageURL, visibility }
+        )
 
         return res.json({
             status: 'success',

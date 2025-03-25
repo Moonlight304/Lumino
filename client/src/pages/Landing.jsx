@@ -1,118 +1,292 @@
 import React, { useEffect, useState } from 'react';
-import { FaUserFriends, FaSearch, FaComments, FaGamepad } from 'react-icons/fa';
+import {
+    FaRocket,
+    FaTrophy,
+    FaUsers,
+    FaHeadset,
+    FaBolt,
+    FaCode,
+    FaGamepad,
+    FaFireAlt
+} from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '../configs/atoms';
+import { motion, AnimatePresence } from 'framer-motion';
 
+// Memoized Background Component to reduce re-renders
+const GamingBackground = React.memo(() => {
+    const GameParticles = React.useMemo(() => {
+        return () => {
+            const particles = [...Array(100)].map((_, i) => {
+                const particleType = Math.random();
+                return (
+                    <motion.div
+                        key={i}
+                        initial={{
+                            x: Math.random() * window.innerWidth,
+                            y: Math.random() * window.innerHeight,
+                            opacity: 0,
+                            scale: particleType > 0.7 ? 1.5 : 1
+                        }}
+                        animate={{
+                            x: [
+                                Math.random() * window.innerWidth,
+                                Math.random() * window.innerWidth,
+                                Math.random() * window.innerWidth
+                            ],
+                            y: [
+                                Math.random() * window.innerHeight,
+                                Math.random() * window.innerHeight,
+                                Math.random() * window.innerHeight
+                            ],
+                            opacity: [0, particleType > 0.5 ? 0.4 : 0.2, 0],
+                        }}
+                        transition={{
+                            duration: Math.random() * 8 + 5,
+                            repeat: Infinity,
+                            repeatType: "loop",
+                            ease: "easeInOut"
+                        }}
+                        className={`absolute ${particleType > 0.8
+                            ? 'bg-red-600/30 w-4 h-4'
+                            : particleType > 0.5
+                                ? 'bg-purple-600/20 w-3 h-3'
+                                : 'bg-blue-600/10 w-2 h-2'
+                            } blur-sm`}
+                    />
+                );
+            });
+            return (
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {particles}
+                </div>
+            );
+        };
+    }, []);
+
+    const HolographicGrid = React.useMemo(() => {
+        return () => (
+            <div className="absolute inset-0 opacity-10 pointer-events-none">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <defs>
+                        <linearGradient id="neon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#ff00ff" stopOpacity="0.2" />
+                            <stop offset="50%" stopColor="#00ffff" stopOpacity="0.1" />
+                            <stop offset="100%" stopColor="#ff0000" stopOpacity="0.05" />
+                        </linearGradient>
+                        <pattern id="holographic-grid" width="40" height="40" patternUnits="userSpaceOnUse">
+                            <path
+                                d="M 40 0 L 0 0 0 40"
+                                fill="none"
+                                stroke="url(#neon-gradient)"
+                                strokeWidth="0.5"
+                                strokeOpacity="0.3"
+                            />
+                        </pattern>
+                    </defs>
+                    <rect width="100%" height="100%" fill="url(#holographic-grid)" />
+                </svg>
+            </div>
+        );
+    }, []);
+
+    return (
+        <div className="fixed inset-0 z-0 overflow-hidden bg-gradient-to-br from-black via-gray-900 to-black">
+            <GameParticles />
+            <HolographicGrid />
+        </div>
+    );
+});
+
+// Optimized Landing Page Component
 export default function Landing() {
     const [globalUserID] = useRecoilState(userIDState);
-
     const navigate = useNavigate();
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
     useEffect(() => {
         if (globalUserID) {
             navigate('/');
         }
-    }, []);
+
+        // Responsive check
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [globalUserID, navigate]);
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                delayChildren: 0.2,
+                staggerChildren: 0.1
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { y: 20, opacity: 0 },
+        visible: {
+            y: 0,
+            opacity: 1,
+            transition: {
+                type: "spring",
+                damping: 10,
+                stiffness: 120
+            }
+        }
+    };
 
     return (
-        <div>
+        <div className="min-h-screen text-white relative overflow-hidden">
+            <GamingBackground />
+
             {/* Header */}
-            <header className="container mx-auto px-10 py-6 flex justify-between items-center">
-                <div className="text-2xl font-bold text-primary">Lumino</div>
-                <nav className="hidden md:block">
-                    <ul className="flex space-x-6">
-                        <Link to={'/'} className="p-2 rounded-lg hover:bg-primary transition duration-300"> Home </Link>
-                        <Link to={'/feed'} className="p-2 rounded-lg hover:bg-primary transition duration-300"> Community </Link>
-                    </ul>
+            <motion.header
+                initial={{ opacity: 0, y: -50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="container mx-auto px-4 py-4 flex justify-between items-center relative z-10"
+            >
+                <motion.div
+                    whileHover={{ scale: 1.05 }}
+                    className="text-3xl md:text-5xl font-black text-red-500"
+                >
+                    LUMINO
+                </motion.div>
+                <nav className={`${isMobile ? 'hidden' : 'flex'} space-x-4 md:space-x-6 items-center`}>
+                    <NavItem to={'/'}>Home</NavItem>
+                    <NavItem to={'/feed'}>Community</NavItem>
+                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                        <Link to={'/auth'}>
+                            <button className="px-4 md:px-8 py-2 md:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition transform shadow-lg text-sm md:text-base">
+                                Join the Battle
+                            </button>
+                        </Link>
+                    </motion.div>
                 </nav>
-                <button className="md:hidden text-2xl">☰</button>
-            </header>
+            </motion.header>
 
             {/* Hero Section */}
-            <section className="container mx-auto px-4 py-20 text-center">
-                <h1 className="text-4xl md:text-5xl font-bold mb-6">Connect. Play. Conquer.</h1>
-                <p className="text-xl mb-8">Join Lumino, the ultimate social gaming platform for passionate gamers.</p>
+            <section className="container mx-auto px-4 py-12 md:py-16 grid md:grid-cols-2 gap-8 md:gap-10 items-center relative z-10">
+                <motion.div
+                    initial={{ x: -100, opacity: 0 }}
+                    animate={{ x: 0, opacity: 1 }}
+                    transition={{ duration: 0.8 }}
+                    className="space-y-4 md:space-y-6 text-center md:text-left"
+                >
+                    <h1 className="text-4xl md:text-7xl font-black text-red-500 animate-pulse leading-tight">
+                        Unleash Your Gaming Potential
+                    </h1>
+                    <p className="text-lg md:text-2xl text-gray-300 opacity-80 tracking-wide">
+                        More than a platform. A digital battleground where legends are forged, skills are sharpened, and gaming dreams become epic reality.
+                    </p>
+                    <motion.div
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.95 }}
+                        className="flex justify-center md:justify-start"
+                    >
+                        <Link to={'/auth'}>
+                            <button className="px-8 md:px-12 py-3 md:py-5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition transform shadow-2xl flex items-center gap-3">
+                                <FaGamepad className='w-10 h-10' /> Start Your Epic Journey
+                            </button>
+                        </Link>
+                    </motion.div>
+                </motion.div>
 
-                <Link to={'/auth'}>
-                    <button className=" text-white border-2 px-8 py-3 rounded-lg text-lg font-semibold shadow-white shadow-lg hover:shadow-xl bg-opacity-80 transition duration-300">
-                        Get Started
-                    </button>
-                </Link>
-            </section>
-
-            {/* Features Section */}
-            <section className="bg-gray-900 py-20">
-                <div className="container mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-12">Why Choose Lumino?</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                {/* Animated Features Grid */}
+                <motion.div
+                    variants={containerVariants}
+                    initial="hidden"
+                    animate="visible"
+                    className="grid grid-cols-2 gap-4 md:gap-6"
+                >
+                    <AnimatePresence>
                         <FeatureCard
-                            icon={<FaUserFriends className="text-4xl mb-4 text-primary" />}
-                            title="Gamer Profiles"
-                            description="Create your unique gamer identity and connect with like-minded players."
+                            variants={itemVariants}
+                            icon={<FaRocket className="text-red-500" />}
+                            title="Epic Battles"
+                            description="Crush opponents in high-stakes multiplayer arenas"
                         />
                         <FeatureCard
-                            icon={<FaSearch className="text-4xl mb-4 text-primary" />}
-                            title="LFG Groups"
-                            description="Find the perfect team for your next gaming session with ease."
+                            variants={itemVariants}
+                            icon={<FaTrophy className="text-purple-500" />}
+                            title="Global Rankings"
+                            description="Dominate leaderboards worldwide"
                         />
                         <FeatureCard
-                            icon={<FaComments className="text-4xl mb-4 text-primary" />}
-                            title="Community Discussions"
-                            description="Engage in vibrant discussions about your favorite games and strategies."
+                            variants={itemVariants}
+                            icon={<FaUsers className="text-blue-500" />}
+                            title="Community Hub"
+                            description="Connect with gamers globally"
                         />
                         <FeatureCard
-                            icon={<FaGamepad className="text-4xl mb-4 text-primary" />}
-                            title="Advanced Matchmaking"
-                            description="Get matched with players that suit your skill level and gaming preferences."
+                            variants={itemVariants}
+                            icon={<FaHeadset className="text-green-500" />}
+                            title="Team Sync"
+                            description="Find perfect gaming allies"
                         />
-                    </div>
-                </div>
-            </section>
-
-            {/* Community Section */}
-            <section className="container mx-auto px-4 py-20 text-center">
-                <h2 className="text-4xl font-bold mb-6">Join Our Thriving Community</h2>
-                <p className="text-xl mb-8">Connect with millions of gamers worldwide and elevate your gaming experience.</p>
-                <div className="flex justify-center space-x-4">
-                    <div className="w-16 h-16 bg-primary rounded-full"></div>
-                    <div className="w-16 h-16 bg-primary rounded-full"></div>
-                    <div className="w-16 h-16 bg-primary rounded-full"></div>
-                </div>
-            </section>
-
-            {/* Call to Action */}
-            <section className="bg-primary py-20">
-                <div className="container mx-auto px-4 text-center">
-                    <h2 className="text-4xl font-bold mb-6">Ready to Level Up Your Gaming Experience?</h2>
-                    <p className="text-xl mb-8">Join thousands of gamers on Lumino and take your gaming to the next level.</p>
-
-                    <button className="bg-background text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-opacity-80 transition duration-300">
-                        <Link to={'/auth'}> Sign Up Now </Link>
-                    </button>
-                </div>
+                    </AnimatePresence>
+                </motion.div>
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-900 py-8">
+            <motion.footer
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                className="bg-black/50 py-6 md:py-8 mt-8 md:mt-16 relative z-10"
+            >
                 <div className="container mx-auto px-4 text-center">
-                    <p>&copy; {new Date().getFullYear()} Lumino. All rights reserved.</p>
-                    <div className="mt-4">
-                        <a href="#" className="text-gray-400 hover:text-primary mx-2 transition duration-300">Terms of Service</a>
-                        <a href="#" className="text-gray-400 hover:text-primary mx-2 transition duration-300">Privacy Policy</a>
-                        <a href="#" className="text-gray-400 hover:text-primary mx-2 transition duration-300">Contact Us</a>
+                    <div className="flex justify-center space-x-4 md:space-x-6 mb-4 md:mb-6">
+                        <FooterIcon icon={<FaBolt className="text-red-500" />} />
+                        <FooterIcon icon={<FaCode className="text-purple-500" />} />
+                        <FooterIcon icon={<FaFireAlt className="text-green-500" />} />
                     </div>
+                    <p className="text-sm md:text-base text-gray-400 tracking-wide">
+                        &copy; {new Date().getFullYear()} Lumino - Where Legends Clash
+                    </p>
                 </div>
-            </footer>
+            </motion.footer>
         </div>
     );
-};
+}
 
-const FeatureCard = ({ icon, title, description }) => {
-    return (
-        <div className="bg-gray-800 p-6 rounded-lg text-center">
-            {icon}
-            <h3 className="text-xl font-semibold mb-2">{title}</h3>
-            <p className="text-gray-300">{description}</p>
-        </div>
-    );
-};
+// Memoized components to prevent unnecessary re-renders
+const NavItem = React.memo(({ to, children }) => (
+    <motion.div
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.9 }}
+    >
+        <Link to={to} className="p-2 text-white hover:text-red-500 transition duration-300 text-sm md:text-base">
+            {children}
+        </Link>
+    </motion.div>
+));
+
+const FeatureCard = React.memo(React.forwardRef(({ icon, title, description, ...props }, ref) => (
+    <motion.div
+        ref={ref}
+        {...props}
+        className="bg-black/60 p-4 md:p-6 rounded-2xl border border-red-900/30 hover:border-red-500 transition transform hover:scale-105 hover:shadow-2xl hover:shadow-red-500/20"
+    >
+        <div className="text-3xl md:text-5xl mb-2 md:mb-4">{icon}</div>
+        <h3 className="text-lg md:text-2xl font-bold mb-1 md:mb-2 text-white">{title}</h3>
+        <p className="text-xs md:text-base text-gray-300">{description}</p>
+    </motion.div>
+)));
+
+const FooterIcon = React.memo(({ icon }) => (
+    <motion.div
+        whileHover={{ rotate: 360, scale: 1.2 }}
+        className="text-2xl md:text-4xl hover:text-red-500 transition"
+    >
+        {icon}
+    </motion.div>
+));

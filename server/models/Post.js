@@ -29,9 +29,6 @@ const postSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    user_avatar: {
-        type: String,
-    },
     body: {
         type: String,
         required: true,
@@ -60,7 +57,7 @@ const postSchema = new mongoose.Schema({
     ],
     comments: [commentSchema],
 }, { timestamps: true });
-postSchema.index({_id : 1, likes: 1})
+postSchema.index({ _id: 1, likes: 1 })
 
 const Post = mongoose.model('Post', postSchema);
 

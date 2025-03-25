@@ -34,16 +34,23 @@ import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
-import { Clipboard, Edit, Trash } from 'lucide-react';
+import { Clipboard, Edit, Settings, Trash } from 'lucide-react';
+import EditPostDialog from './EditPostDialog';
+import { Input } from '@/components/ui/input';
+import fetchUser from '@/helpers/fetchUser';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function PostCard({ post }) {
+export default function PostCard({ post, setPosts }) {
     const [globalUserID] = useRecoilState(userIDState);
     const [timeAgo, setTimeAgo] = useState(null);
     const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
+
+    const [postUsername, setPostUsername] = useState(null);
+    const [postUserAvatar, setPostUserAvatar] = useState(null);
+    const [dropdownOpen, setDropdownOpen] = useState(false)
 
     async function getLikeInclude() {
         try {
@@ -83,7 +90,7 @@ export default function PostCard({ post }) {
                 setIsLiked(!isLiked)
             }
             else {
-                toast.warn(data.message, toastConfig);
+                toast.error(data.message, toastConfig);
             }
         }
         catch (e) {
@@ -104,8 +111,9 @@ export default function PostCard({ post }) {
             if (data.status === 'success')
                 setIsSaved(JSON.parse(data.message));
             else
-                toast.warn(data.message, toastConfig);
-        } catch (e) {
+                toast.error(data.message, toastConfig);
+        }
+        catch (e) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
@@ -124,7 +132,7 @@ export default function PostCard({ post }) {
                 setIsSaved(!isSaved);
             }
             else {
-                toast.warn(data.message, toastConfig);
+                toast.error(data.message, toastConfig);
             }
         }
         catch (e) {
@@ -167,10 +175,11 @@ export default function PostCard({ post }) {
             const data = response.data;
 
             if (data.status === 'success') {
+                setPosts((prev) => prev.filter((prevPost) => prevPost?._id !== post?._id));
                 toast.success(data.message, toastConfig);
             }
             else {
-                toast.warn(data.message, toastConfig);
+                toast.error(data.message, toastConfig);
             }
         }
         catch (e) {
@@ -187,53 +196,74 @@ export default function PostCard({ post }) {
             setTimeAgo(formattedTime);
         }
 
+        async function getUser() {
+            try {
+                const fetchedUser = await fetchUser(post?.userID);
+
+                setPostUsername(fetchedUser.display_name);
+                setPostUserAvatar(fetchedUser.profile_picture);
+            }
+            catch (e) {
+                console.log(e.message);
+                toast.error('Oops.. an error occurred', toastConfig);
+            }
+        }
+
         getLikeInclude();
         setLikeCount(post?.likeCount);
         getSavedInclude();
+        getUser();
     }, []);
 
 
 
     return (
-        <div className="flex flex-col justify-center items-center w-[95%] sm:w-2/3 md:w-3/4 max-w-xl m-5 mt-5 bg-fourth rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col justify-center items-center w-[95%] sm:w-2/3 md:w-3/4 max-w-2xl m-5 mt-5 bg-fourth rounded-lg shadow-lg overflow-hidden">
             <div className="p-4 border-b-[#999999] border-b-2 w-[95%]">
-                <div className="flex items-center space-x-4 relative">
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-[#616161]">
-                        {/* <img src={post?.user_avatar || "/placeholder.svg"} alt={post?.display_name} className="w-full h-full object-cover" /> */}
-                        {post?.user_avatar
-                            ?
-                            <img src={post?.user_avatar} alt="avatar_image" className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
-                            :
-                            <CgProfile className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
-                        }
-                    </div>
-                    <div>
-                        <h2 className="inline-block text-lg font-semibold text-white hover:underline "> <Link to={`/user/${post?.userID}`}>{post?.display_name}</Link></h2>
+                <div className="flex items-center space-x-8 relative">
+                    <div className="flex items-center space-x-2 relative">
+                        <div className="w-12 h-12 rounded-full overflow-hidden bg-[#616161]">
+                            {/* <img src={post?.user_avatar || "/placeholder.svg"} alt={post?.display_name} className="w-full h-full object-cover" /> */}
+                            {postUserAvatar
+                                ?
+                                <img src={postUserAvatar} alt="avatar_image" className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
+                                :
+                                <CgProfile className="w-full h-full rounded-full border-2 border-secondary object-cover mr-4" />
+                            }
+                        </div>
+                        <div>
+                            <h2 className="inline-block text-lg font-semibold text-white hover:underline "> <Link to={`/user/${post?.display_name}`}>{postUsername}</Link></h2>
 
-                        <div className='flex items-center gap-2'>
-                            <p className="text-sm text-[#BDBDBD]"> {timeAgo} </p>
+                            <div className='flex items-center gap-2'>
+                                <p className="text-sm text-[#BDBDBD]"> {timeAgo} </p>
 
-                            <div className='cursor-pointer'>
-                                {post?.visibility === 'everyone'
-                                    ?
-                                    <CiGlobe className='w-5 h-5' />
-                                    :
-                                    <GoPeople className='w-5 h-5' />
-                                }
+                                <div className='cursor-pointer'>
+                                    {post?.visibility === 'everyone'
+                                        ?
+                                        <CiGlobe className='w-5 h-5' />
+                                        :
+                                        <GoPeople className='w-5 h-5' />
+                                    }
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     {globalUserID === post?.userID &&
-                        <div className='flex items-center gap-3 absolute right-5 '>
-                            <DropdownMenu>
+                        <div className='flex items-center gap-3 absolute right-5 group'>
+                            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline"> ⚙️ </Button>
+                                    <Button className='bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white'>
+                                        <Settings
+                                            className='text-white cursor-pointer group-hover:rotate-90 transition scale-120'
+                                        />
+                                    </Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className={'bg-[#EEEEEE]'}>
                                     <DropdownMenuGroup>
-                                        <DropdownMenuItem>
-                                            <Edit />
+                                        <DropdownMenuItem
+                                        >
+                                            <Edit className="mr-2 h-4 w-4" />
                                             Edit
                                         </DropdownMenuItem>
                                         <DropdownMenuItem onClick={handleDeletePost}>
@@ -243,16 +273,15 @@ export default function PostCard({ post }) {
                                         {/* <DropdownMenuItem>
                                             <Clipboard />
                                             Copy link
-                                        </DropdownMenuItem> */}
+                                            </DropdownMenuItem> */}
                                     </DropdownMenuGroup>
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         </div>
                     }
-
-
                 </div>
             </div>
+
             <div className="px-4 py-2 space-y-4 w-full">
                 <p className="text-[#BDBDBD] w-full break-all whitespace-pre-wrap"> {post?.body.trim()} </p>
                 <Dialog>

@@ -20,6 +20,7 @@ import { Label } from "@/components/ui/label";
 import { Filter, Loader2, Minus, Plus, Users } from "lucide-react"
 import { countryCodes } from '../configs/countryCodes';
 import Filters from "@/components/Filters"
+import Loading from "@/components/Loading"
 
 
 const server_url = import.meta.env.VITE_server_url
@@ -77,9 +78,7 @@ export default function Discover() {
     }, [globalUserID, navigate])
 
     return (
-        <div className="min-h-screen bg-background text-white">
-            <Navbar />
-
+        <div className="min-h-fit bg-background text-white">
             <main className="w-full px-4 py-8">
                 <div className="flex flex-col md:flex-row gap-6">
                     <Drawer className="text-white">
@@ -117,10 +116,7 @@ export default function Discover() {
                             Discover Gamers
                         </h1>
                         {isLoading ? (
-                            <div className="flex flex-col items-center justify-center h-96">
-                                <Loader2 className="h-12 w-12 animate-spin text-red-500 mb-4" />
-                                <p className="text-lg text-red-400">Finding players for you...</p>
-                            </div>
+                            <Loading message={'Finding players for you...'} />
                         ) : users.length === 0 ? (
                             <div className="flex flex-col items-center justify-center h-96 text-center">
                                 <Users className="h-16 w-16 text-red-500 mb-4" />

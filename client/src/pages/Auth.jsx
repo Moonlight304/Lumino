@@ -61,7 +61,7 @@ export default function Auth() {
             else {
                 const { display_name, email, password, confirm_password } = formData;
                 if (password !== confirm_password) {
-                    toast.warn('Passwords don\'t match!', toastConfig);
+                    toast.error('Passwords don\'t match!', toastConfig);
                     return;
                 }
 

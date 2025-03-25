@@ -11,6 +11,7 @@ import { userIDState } from '../configs/atoms';
 import Navbar from '../components/Navbar';
 import PostCard from '../components/PostCard';
 import NewPostCard from '@/components/NewPostCard';
+import Loading from '@/components/Loading';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -27,7 +28,6 @@ export default function Feed() {
                 }
             });
             const data = response.data;
-            console.log(data);
 
             if (data.status === 'success') {
                 setPosts(data.allPosts);
@@ -56,10 +56,8 @@ export default function Feed() {
 
     return (
         <>
-            <Navbar />
-
             {isLoading ? (
-                <h1>Loading...</h1>
+                <Loading message={'Loading latest posts...'} />
             ) : (
                 <div className='flex flex-col items-center'>
                     <NewPostCard
@@ -73,6 +71,7 @@ export default function Feed() {
                                 <PostCard
                                     key={index}
                                     post={post}
+                                    setPosts={setPosts}
                                 />
                             );
                         })

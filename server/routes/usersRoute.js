@@ -83,6 +83,36 @@ router.get('/discover', authMiddleware, async (req, res) => {
     }
 });
 
+router.get('/me', authMiddleware, async (req, res) => {
+    const { userID } = req.user;
+
+    try {
+        if (!userID)
+            return res.json({
+                status: 'fail',
+                message: 'UserId is required'
+            })
+
+        const user = await User.findById(userID);
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'User not found'
+            })
+
+        return res.json({
+            status: 'success',
+            user
+        });
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: e.message,
+        })
+    }
+})
+
 router.get('/getUser/:userID', authMiddleware, async (req, res) => {
     const { userID } = req.params;
     try {
@@ -102,6 +132,41 @@ router.get('/getUser/:userID', authMiddleware, async (req, res) => {
         return res.json({
             status: 'success',
             user
+        });
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: e.message,
+        })
+    }
+})
+
+router.get('/getUserByName/:display_name', authMiddleware, async (req, res) => {
+    const { display_name } = req.params;
+
+    try {
+        if (!display_name)
+            return res.json({
+                status: 'fail',
+                message: 'Display Name is required'
+            })
+
+        const user = await User.findOne({ display_name });
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'User not found'
+            })
+
+        const userObject = user.toObject();
+        const { passwordHash, ...safeUser } = userObject;
+
+        console.log(safeUser);
+
+        return res.json({
+            status: 'success',
+            user: safeUser
         });
     }
     catch (e) {
@@ -189,13 +254,90 @@ router.get('/delete_notification/:notificationID', authMiddleware, async (req, r
         return res.json({
             status: 'success',
             message: 'deleted notification'
-            
+
         });
     }
     catch (e) {
         return res.json({
             status: 'fail',
             message: e.message + 'fa;fkad;fk;kj',
+        })
+    }
+})
+
+router.post('/edit_user/:userID', authMiddleware, async (req, res) => {
+    try {
+        const { userID } = req.params;
+
+        if (!userID)
+            return res.json({
+                status: 'fail',
+                message: 'no username found',
+            })
+
+        const user = await User.findById(userID);
+
+        if (!user)
+            return res.json({
+                status: 'fail',
+                message: 'user not found',
+            })
+
+        console.log(req.body)
+
+        await User.updateOne(
+            { _id: userID },
+            {
+                age: req.body.age,
+                bio: req.body.bio,
+                profile_picture: req.body.profile_picture,
+                country: req.body.country,
+                gender: req.body.gender,
+                platform: req.body.platform,
+                playstyle: req.body.playstyle,
+                communication_preference: req.body.communication_preference,
+                steam_id: req.body.steam_id,
+                discord_username: req.body.discord_username,
+                favourite_games: req.body.favourite_games ? req.body.favourite_games.split(',').map(game => game.trim()) : [],
+                favourite_genres: req.body.favourite_genres ? req.body.favourite_genres.split(',').map(genre => genre.trim()) : []
+            }
+        );
+
+        return res.json({
+            status: 'success',
+            message: 'Updated profile',
+        })
+    }
+    catch (e) {
+        console.log(e.message)
+        return res.json({
+            status: 'fail',
+            message: e.message,
+        })
+    }
+})
+
+router.get('/delete_user/:username', authMiddleware, async (req, res) => {
+    try {
+        const { username } = req.params;
+
+        if (!username)
+            return res.json({
+                status: 'fail',
+                message: 'Username not found',
+            })
+
+        await User.deleteOne({ username });
+
+        return res.json({
+            status: 'success',
+            message: 'Deleted account',
+        })
+    }
+    catch (e) {
+        return res.json({
+            status: 'fail',
+            message: 'Error : ' + e,
         })
     }
 })

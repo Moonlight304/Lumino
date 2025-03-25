@@ -214,4 +214,58 @@ router.get('/cancel_request/:receiverID/:senderID', authMiddleware, async (req, 
     }
 })
 
+router.get('/check/:remoteID', authMiddleware, async (req, res) => {
+    const { remoteID } = req.params;
+    const { userID } = req.user;
+
+    console.log(remoteID)
+
+    try {
+        const user = await User.findById(userID);
+
+        if (!user)
+            return res.json({
+                status: "fail",
+                message: "User not found"
+            })
+
+            
+            
+
+
+        if (user.connectedIDs.map(id => id.toString()).includes(remoteID.toString())) {
+            return res.json({
+                status: 'success',
+                message: 'Connected'
+            });
+        }
+        else if (user.sentIDs.map(id => id.toString()).includes(remoteID.toString())) {
+            return res.json({
+                status: 'success',
+                message: 'Sent'
+            });
+        }
+        else if (user.receivedIDs.map(id => id.toString()).includes(remoteID.toString())) {
+            return res.json({
+                status: 'success',
+                message: 'Accept'
+            });
+        }
+        else {
+            return res.json({
+                status: 'success',
+                message: 'Nothing'
+            });
+        }
+
+    }
+    catch (e) {
+        console.log(e.message);
+        return res.json({
+            success: 'fail',
+            message: e.message
+        });
+    }
+})
+
 module.exports = router;

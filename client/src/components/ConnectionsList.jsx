@@ -8,6 +8,7 @@ import toastConfig from '../configs/toastConfig';
 
 import { userIDState } from '../configs/atoms';
 import fetchUser from '../helpers/fetchUser';
+import Loading from './Loading';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -102,6 +103,8 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
             return <div className="text-gray-400 p-4">{emptyMessage}</div>;
         }
 
+        console.log(users);
+
         return users.map((user) => (
             <div
                 key={user?._id}
@@ -179,9 +182,7 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
                 {/* User Lists */}
                 <div className="flex-grow overflow-y-auto">
                     {isLoading ? (
-                        <div className="flex justify-center items-center h-full">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                        </div>
+                        <Loading message={'Getting your connections...'} />
                     ) : (
                         <>
                             {tab === 'connected' &&

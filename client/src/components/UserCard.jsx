@@ -10,6 +10,7 @@ import { useRecoilState } from "recoil";
 
 import { countryCodes } from '../configs/countryCodes';
 import { userIDState } from "../configs/atoms";
+import { Link } from "react-router-dom";
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -53,7 +54,7 @@ export default function UserCard({ user, setUsers }) {
                         <CgProfile className="min-w-20 min-h-20 rounded-full border-2 border-secondary object-cover mr-4" />
                     )}
                     <div>
-                        <h2 className="text-xl font-semibold text-gray-300 dark:text-white">{user?.display_name}</h2>
+                        <Link to={`/user/${user?.display_name}`}> <h2 className="text-xl font-semibold text-gray-300 dark:text-white">{user?.display_name}</h2> </Link>
                         <div className="flex items-center mt-1">
                             {user.country ? (
                                 <img

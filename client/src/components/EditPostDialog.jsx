@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";
 import { displayNameState, avatarURLState } from "@/configs/atoms";
 import { FaImage } from "react-icons/fa6";
@@ -21,6 +21,8 @@ import {
     DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea"
+
 
 import handleFileChange from "@/helpers/handleFileChange";
 import { toast } from 'react-hot-toast';
@@ -29,37 +31,23 @@ import { Trash2 } from "lucide-react";
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function NewPostCard({ setPosts, existingPost = null }) {
+export default function EditPostDialog({ existingPost }) {
     const [globalDisplayName] = useRecoilState(displayNameState);
     const [globalAvatarURL] = useRecoilState(avatarURLState);
+
     const [body, setBody] = useState('');
     const [imageURL, setImageURL] = useState('');
-    const [visibility, setVisibility] = useState('everyone');
+    const [visibility, setVisibility] = useState('');
 
-    async function handleNewPost() {
+    useEffect(() => {
+        setBody(existingPost.body);
+        setImageURL(existingPost.imageURL);
+        setVisibility(existingPost.visibility);
+    }, [existingPost]);
+
+    async function handleEditPost() {
         try {
-            const response = await axios.post(`${server_url}/posts/new_post`,
-                { body, imageURL, visibility },
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                    }
-                }
-            )
-            const data = response.data;
-
-            if (data.status === 'success') {
-                toast.success('Posted', toastConfig);
-
-                setImageURL('');
-                setBody('');
-
-                setPosts((prev) => [data.newPost, ...prev]);
-            }
-            else {
-                toast.error(data.message, toastConfig);
-                console.log(data.message);
-            }
+            console.log("HELO")
         }
         catch (e) {
             toast.error('Oops try again', toastConfig);
@@ -68,32 +56,21 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center p-2 w-[95%] sm:w-2/3 md:w-3/4 max-w-2xl m-5 mt-5 bg-fourth rounded-lg shadow-lg overflow-hidden">
-            <div className="flex mb-2">
-                {globalAvatarURL !== ''
-                    ?
-                    <img
-                        src={globalAvatarURL}
-                        alt="avatar_image"
-                        className="w-16 h-16 rounded-full border-2 border-secondary object-cover mr-4"
-                    />
-                    :
-                    <CgProfile
-                        className="w-20 h-20 rounded-full object-cover mr-4"
-                    />
-                }
+        <div className="text-white">
+            <textarea
+                className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-1 py-1 focus:outline-none focus:border-primary"
+                // name="body"
+                // id="body"
+                // value={body}
+                // onChange={(e) => setBody(e.target.value)}
+                // cols={100}
+                // required
+                onClick={(e) => {
+                    console.log("HELLO BUTTOn")
+                    e.target.focus();
+                }}
+            ></textarea>
 
-                <textarea
-                    className="w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-1 py-1 focus:outline-none focus:border-primary"
-                    name="body"
-                    id="body"
-                    value={body}
-                    onChange={(e) => setBody(e.target.value)}
-                    cols={100}
-                    placeholder={`Share what\'s on your mind, ${globalDisplayName}...`}
-                    required
-                ></textarea>
-            </div>
 
             {imageURL &&
                 <div className="relative group">
@@ -125,7 +102,6 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                 <label htmlFor="feed_image" className="cursor-pointer">
                     <FaImage
                         className="w-8 h-8 hover:opacity-70"
-                        // onChange={(e) => handleFileChange(e, 'feed')}
                     />
                 </label>
 
@@ -160,8 +136,8 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                         </DropdownMenu>
                     </div>
 
-                    <div onClick={handleNewPost}>
-                        <Button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"> Post </Button>
+                    <div onClick={handleEditPost}>
+                        <Button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"> Save </Button>
                     </div>
                 </div>
             </div>

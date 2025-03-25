@@ -9,6 +9,7 @@ import { Link, useNavigate } from "react-router-dom"
 import { toast } from 'react-hot-toast'
 import toastConfig from "@/configs/toastConfig"
 import { Bell, Check, ExternalLink, Loader2, Trash2 } from "lucide-react"
+import Loading from "@/components/Loading"
 
 const server_url = import.meta.env.VITE_server_url
 
@@ -96,8 +97,6 @@ export default function Notifications() {
 
     return (
         <>
-            <Navbar />
-
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <div className="flex items-center gap-2 mb-6">
                     <Bell className="h-6 w-6 text-primary" />
@@ -105,10 +104,7 @@ export default function Notifications() {
                 </div>
 
                 {isLoading ? (
-                    <div className="flex flex-col items-center justify-center py-12">
-                        <Loader2 className="h-8 w-8 animate-spin text-primary mb-4" />
-                        <p className="text-muted-foreground">Loading notifications...</p>
-                    </div>
+                    <Loading message={'Getting your notifications...'} />
                 ) : notifications?.length > 0 ? (
                     <div className="space-y-4">
                         {notifications.map((notification, index) => (

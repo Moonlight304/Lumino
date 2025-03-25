@@ -58,7 +58,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                 setNewMessage('');
             }
             else {
-                toast.warn(data.message, toastConfig);
+                toast.error(data.message, toastConfig);
             }
         }
         catch (e) {
@@ -73,7 +73,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
 
         console.log('Socket:');
         console.log(newSocket);
-        
+
         newSocket.emit('call-accepted', ({ callerSocketID, answer }));
         navigate(`/call/${globalUserID}`);
     }
@@ -110,7 +110,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
         clearTimeout(typingTimeout.current);
         typingTimeout.current = setTimeout(() => {
             socket.emit('isTyping', false, remoteUserID);
-        }, 500);
+        }, 700);
     };
 
 
@@ -120,8 +120,8 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                 {remoteUser ? (
                     <>
                         {/* Chat Header */}
-                        <div className='flex items-center justify-between'>
-                            <div className="bg-gray-800 p-4 flex items-center">
+                        <div className='flex items-center justify-between bg-gray-800'>
+                            <div className="p-4 flex items-center">
                                 {remoteUser?.profile_picture ? (
                                     <img
                                         className="w-10 h-10 rounded-full border-2 border-blue-500 object-cover mr-4"
@@ -131,7 +131,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                 ) : (
                                     <CgProfile className="w-10 h-10 text-blue-500 mr-4" />
                                 )}
-                                <h2 className="text-xl font-semibold">{remoteUser?.display_name}</h2>
+                                <h2 onClick={() => navigate(`/user/${remoteUser?.display_name}`)} className="text-xl font-semibold">{remoteUser?.display_name}</h2>
                             </div>
 
                             <div>
@@ -161,7 +161,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                             {messages?.map((message, index) => (
                                 <div
                                     key={index}
-                                    className={` ${message?.senderID !== remoteUser?._id && 'text-right' }`}
+                                    className={` ${message?.senderID !== remoteUser?._id && 'text-right'}`}
                                 >
                                     <div
                                         className={`inline-block max-w-[70%] mb-4 rounded-lg  ${message?.senderID === remoteUser?._id
@@ -187,30 +187,42 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                             {/* Ref to the last message */}
                             <div ref={lastMessageRef} />
 
-                            {remoteUserIsTyping && <div className='chat chat-start chat-bubble'> typing... </div>}
+                            {remoteUserIsTyping &&
+                                <div className='chat chat-start chat-bubble'>
+                                    <div className="flex items-center gap-1 p-3 rounded-lg bg-gray-800 text-gray-500 text-sm w-fit">
+                                        <div className="flex gap-0.5">
+                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
 
                         </div>
 
                         {/* Message Input */}
-                        <div className="p-4 bg-gray-900">
-                            <div className="flex justify-center items-center">
-                                <input
-                                    className="hidden"
-                                    type="file"
-                                    id="imageFile"
-                                    onChange={async (event) => {
-                                        const imageURL = await handleFileChange(event, 'chats');
-                                        await handleMessage(imageURL);
-                                    }}
-                                />
-                                <label htmlFor="imageFile" className="p-3 mr-3 cursor-pointer rounded-full hover:bg-gray-600">
-                                    <FiPaperclip className="scale-150" />
-                                </label>
+                        <div className="p-4 bg-gray-900 flex justify-center items-center w-full">
 
-                                {/* <div >
-                                    <h1> Hello </h1>
+                            {/* doesnt render */}
+                            <input
+                                className="hidden"
+                                type="file"
+                                id="imageFile"
+                                onChange={async (event) => {
+                                    const imageURL = await handleFileChange(event, 'chats');
+                                    await handleMessage(imageURL);
+                                }}
+                            />
 
-                                </div> */}
+                            <label
+                                htmlFor="imageFile"
+                                className="p-0 mr-3 cursor-pointer rounded-full hover:bg-gray-600"
+                            >
+                                <FiPaperclip className="scale-150" />
+                            </label>
+
+                            <div className='flex w-full'>
                                 <input
                                     type="text"
                                     value={newMessage}
@@ -232,8 +244,8 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                 >
                                     Send
                                 </button>
-
                             </div>
+
                         </div>
                     </>
                 ) : (
