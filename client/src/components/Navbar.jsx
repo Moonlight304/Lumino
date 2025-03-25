@@ -5,6 +5,7 @@ import { CgProfile } from "react-icons/cg";
 import { Bell, Compass, Gamepad, LogOut, Menu, Newspaper } from "lucide-react";
 import {
     Sheet,
+    SheetClose,
     SheetContent,
     SheetDescription,
     SheetHeader,
@@ -75,35 +76,57 @@ export default function Navbar() {
                     <Menu size={28} />
                 </SheetTrigger>
 
-                <SheetContent className={'text-white flex flex-col pt-10'}>
-
+                <SheetContent className="text-white flex flex-col pt-10">
                     <div className="text-3xl font-bold text-primary mb-5">Lumino</div>
 
-                    <Link to={'/discover'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Compass /> Discover </Link>
-                    <Link to={'/feed'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Newspaper /> Feed </Link>
-                    <Link to={'/connections'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Gamepad /> Connections </Link>
-                    <Link to={'/notifications'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Bell /> Notifications </Link>
+                    <SheetClose asChild>
+                        <Link to="/discover" className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4">
+                            <Compass /> Discover
+                        </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                        <Link to="/feed" className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4">
+                            <Newspaper /> Feed
+                        </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                        <Link to="/connections" className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4">
+                            <Gamepad /> Connections
+                        </Link>
+                    </SheetClose>
+
+                    <SheetClose asChild>
+                        <Link to="/notifications" className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4">
+                            <Bell /> Notifications
+                        </Link>
+                    </SheetClose>
 
                     <div className="mt-5 space-y-2">
-                        <Button
-                            onClick={() => handleLogout()}
-                            className="p-2 bg-transparent w-full scale-130 rounded-lg hover:bg-primary transition duration-300 flex gap-4"
-                        > <LogOut /> Log Out </Button>
+                        <SheetClose asChild>
+                            <Link to={`/user/${globalDisplayName}`} className="px-3 py-1 rounded-lg hover:bg-primary transition duration-300 flex items-center">
+                                {globalAvatarURL ? (
+                                    <img src={globalAvatarURL} alt="avatar_image" className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
+                                ) : (
+                                    <CgProfile className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
+                                )}
+                                <h1> {globalDisplayName} </h1>
+                            </Link>
+                        </SheetClose>
 
-                        <Link to={`/user/${globalDisplayName}`} className="px-3 py-1 rounded-lg hover:bg-primary transition duration-300 flex items-center">
-                            {globalAvatarURL
-                                ?
-                                <img src={globalAvatarURL} alt="avatar_image" className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
-                                :
-                                <CgProfile className="w-11 h-11 rounded-full border-2 border-secondary object-cover mr-4" />
-                            }
-                            <h1> {globalDisplayName} </h1>
-                        </Link>
-
+                        <SheetClose asChild>
+                            <Button
+                                onClick={handleLogout}
+                                className="p-2 bg-transparent w-full scale-130 rounded-lg hover:bg-primary transition duration-300 flex gap-4"
+                            >
+                                <LogOut /> Log Out
+                            </Button>
+                        </SheetClose>
                     </div>
-
                 </SheetContent>
             </Sheet>
+
 
 
         </header>
