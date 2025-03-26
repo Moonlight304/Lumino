@@ -94,9 +94,12 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
             setMessages((prev) => [...prev, messageObject]);
         });
 
-        newSocket.on('isTyping', (isTyping) => {
-            setRemoteUserIsTyping(isTyping);
-        })
+        newSocket.on('isTyping', ({ isTyping, senderID }) => {
+            // Only update if the typing notification is from our current chat partner
+            if (senderID === remoteUserID) {
+                setRemoteUserIsTyping(isTyping ? { isTyping, senderID } : null);
+            }
+        });
 
         newSocket.on('incoming-call', ({ callerSocketID, offer }) => {
             handleIncomingCall(newSocket, callerSocketID, offer);
@@ -112,13 +115,26 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
     function handleTyping(value) {
         setNewMessage(value);
 
-        socket.emit('isTyping', true, remoteUserID);
+        if (remoteUserID && socket) {
+            if (typingTimeout.current) {
+                clearTimeout(typingTimeout.current);
+            }
 
-        // Clear the previous timeout and set a new one
-        clearTimeout(typingTimeout.current);
-        typingTimeout.current = setTimeout(() => {
-            socket.emit('isTyping', false, remoteUserID);
-        }, 700);
+            socket.emit('isTyping', {
+                isTyping: true,
+                receiverID: remoteUserID,
+                senderID: globalUserID
+            });
+
+            // emit typing false after 1 sec
+            typingTimeout.current = setTimeout(() => {
+                socket.emit('isTyping', {
+                    isTyping: false,
+                    receiverID: remoteUserID,
+                    senderID: globalUserID
+                });
+            }, 1000);
+        }
     };
 
 
@@ -208,7 +224,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                             {/* Ref to the last message */}
                             <div ref={lastMessageRef} />
 
-                            {remoteUserIsTyping &&
+                            {remoteUserIsTyping && remoteUserIsTyping.senderID === remoteUserID && (
                                 <div className='chat chat-start chat-bubble'>
                                     <div className="flex items-center gap-1 p-3 rounded-lg bg-gray-800 text-gray-500 text-sm w-fit">
                                         <div className="flex gap-0.5">
@@ -218,7 +234,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                         </div>
                                     </div>
                                 </div>
-                            }
+                            )}
 
                         </div>
 

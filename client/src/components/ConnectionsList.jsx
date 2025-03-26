@@ -33,13 +33,41 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
     async function fetchTabUsers() {
         try {
             const fetchedUser = await fetchUser(globalUserID);
-            const connectedPlayers = await Promise.all(fetchedUser?.connectedIDs.map(fetchUser));
+
+            // connected players
+            const connectedPlayers = await Promise.all(fetchedUser?.connectedIDs.map(async (id) => {
+                try {
+                    return await fetchUser(id);
+                }
+                catch (error) {
+                    console.error(`Error fetching user ${id}:`, error);
+                    return null;
+                }
+            }));
             setConnected(connectedPlayers);
 
-            const receivedPlayers = await Promise.all(fetchedUser?.receivedIDs.map(fetchUser));
+            // players from which connection request is received
+            const receivedPlayers = await Promise.all(fetchedUser?.receivedIDs.map(async (id) => {
+                try {
+                    return await fetchUser(id);
+                }
+                catch (error) {
+                    console.error(`Error fetching user ${id}:`, error);
+                    return null;
+                }
+            }));
             setReceived(receivedPlayers);
 
-            const sentPlayers = await Promise.all(fetchedUser?.sentIDs.map(fetchUser));
+            // players to which connection request was sent
+            const sentPlayers = await Promise.all(fetchedUser?.sentIDs.map(async (id) => {
+                try {
+                    return await fetchUser(id);
+                }
+                catch (error) {
+                    console.error(`Error fetching user ${id}:`, error);
+                    return null;
+                }
+            }));
             setSent(sentPlayers);
         }
         catch (e) {

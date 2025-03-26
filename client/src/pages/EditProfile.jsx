@@ -85,6 +85,8 @@ export default function EditProfile({ onProfileUpdate }) {
         setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
+    const navigate = useNavigate();
+
     async function handleEditProfile(e) {
         e.preventDefault();
 
@@ -98,6 +100,7 @@ export default function EditProfile({ onProfileUpdate }) {
 
             if (data.status === 'success') {
                 toast.success('Profile updated successfully', toastConfig);
+                navigate(`/user/${globalDisplayName}`);
             }
         }
         catch (error) {
@@ -106,7 +109,6 @@ export default function EditProfile({ onProfileUpdate }) {
         }
     };
 
-    const navigate = useNavigate();
     useEffect(() => {
         if (!globalUserID) {
             navigate('/');

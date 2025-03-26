@@ -9,7 +9,7 @@ const client_url = process.env.client_url;
 const server = http.createServer(app);
 const io = require("socket.io")(server, {
     cors: {
-        origin: client_url,
+        origin: process.env.client_url,
         methods: ["GET", "POST"]
     }
 });
@@ -42,7 +42,7 @@ io.on('connection', (socket) => {
     socket.on('call-accepted', ({ callerSocketID, answer }) => {
         io.to(callerSocketID).emit('call-accepted', { remoteSocketID: socket.id, answer });
     })
-    
+
     // message socket
     socket.on('messageObject', (messageObject) => {
         console.log('Sending message to : ', usersSocketMap[messageObject.receiverID]);
@@ -51,9 +51,20 @@ io.on('connection', (socket) => {
     })
 
     // isTyping socket
-    socket.on('isTyping', (isTyping, receiverID) => {
-        io.to(usersSocketMap[receiverID]).emit('isTyping', isTyping);
-    })
+    socket.on('isTyping', ({ isTyping, receiverID, senderID }) => {
+        const receiverSocket = usersSocketMap[receiverID];
+
+        if (socketsUserMap[socket.id] !== senderID) {
+            return;
+        }
+
+        if (receiverSocket && receiverSocket !== socket.id) {
+            io.to(receiverSocket).emit('isTyping', {
+                isTyping,
+                senderID: senderID
+            });
+        }
+    });
 
     socket.on('disconnect', () => {
         console.log(`A user disconnected : ${socket.id}`);
