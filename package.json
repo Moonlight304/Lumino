@@ -1,0 +1,9 @@
+{
+    "name": "lumino",
+    "version": "1.0.0",
+    "private": true,
+    "scripts": {
+        "install-all": "cd client && npm install && cd ../server && npm install",
+        "dev": "npx concurrently \"cd client && npm run dev\" \"cd server && npm run dev\""
+    }
+}
