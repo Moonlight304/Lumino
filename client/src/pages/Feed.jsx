@@ -20,31 +20,35 @@ export default function Feed() {
     const [globalUserID] = useRecoilState(userIDState);
     const [posts, setPosts] = useState([]);
 
-    async function getPosts() {
-        try {
-            const response = await axios.get(`${server_url}/posts/`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+    useEffect(() => {
+        async function getPosts() {
+            try {
+                const response = await axios.get(`${server_url}/posts/`, {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                    }
+                });
+                const data = response.data;
+
+                if (data.status === 'success') {
+                    setPosts(data.allPosts);
                 }
-            });
-            const data = response.data;
+                else {
+                    toast.error(data.message, toastConfig);
+                }
 
-            if (data.status === 'success') {
-                setPosts(data.allPosts);
             }
-            else {
-                toast.error(data.message, toastConfig);
+            catch (e) {
+                console.log(e.message);
+                toast.error('Oops.. an error occurred', toastConfig);
             }
+            finally {
+                setIsLoading(false);
+            }
+        }
 
-        }
-        catch (e) {
-            console.log(e.message);
-            toast.error('Oops.. an error occurred', toastConfig);
-        }
-        finally {
-            setIsLoading(false);
-        }
-    }
+        getPosts();
+    }, []);
 
     const navigate = useNavigate();
     useEffect(() => {

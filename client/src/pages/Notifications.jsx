@@ -18,28 +18,35 @@ export default function Notifications() {
     const [globalUserID] = useRecoilState(userIDState)
     const [notifications, setNotifications] = useState([])
 
-    async function fetchNotifications() {
-        setIsLoading(true)
-        try {
-            const response = await axios.get(`${server_url}/users/getUser/${globalUserID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
-                },
-            })
-            const data = response.data
+    useEffect(() => {
+        async function fetchNotifications() {
+            setIsLoading(true)
 
-            if (data.status === "success") {
-                console.log(data.user.notifications)
-                setNotifications(data.user.notifications)
-            } else {
-                toast.error(data.message, toastConfig)
+            try {
+                const response = await axios.get(`${server_url}/users/getUser/${globalUserID}`, {
+                    headers: {
+                        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
+                    },
+                })
+                const data = response.data
+
+                if (data.status === "success") {
+                    console.log(data.user.notifications)
+                    setNotifications(data.user.notifications)
+                } else {
+                    toast.error(data.message, toastConfig)
+                }
             }
-        } catch (e) {
-            toast.error("Oops.. an error occurred", toastConfig)
-        } finally {
-            setIsLoading(false)
+            catch (e) {
+                toast.error("Oops.. an error occurred", toastConfig)
+            }
+            finally {
+                setIsLoading(false)
+            }
         }
-    }
+
+        fetchNotifications();
+    }, []);
 
     async function handleRead(notificationID) {
         try {
