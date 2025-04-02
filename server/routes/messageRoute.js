@@ -172,6 +172,55 @@ router.get('/accept_request/:receiverID/:senderID', authMiddleware, async (req, 
     }
 })
 
+router.get('/remove_connection/:receiverID/:senderID', authMiddleware, async (req, res) => {
+    const { senderID, receiverID } = req.params;
+
+    try {
+        const sender = await User.findById(senderID);
+        const receiver = await User.findById(receiverID);
+        if (!sender || !receiver) {
+            return res.json({
+                success: 'fail',
+                message: 'User not found'
+            });
+        }
+
+        const senderUpdate = User.updateOne(
+            { _id: senderID },
+            {
+                $pull: { connectedIDs: receiverID },
+            }
+        )
+        const receiverUpdate = User.updateOne(
+            { _id: receiverID },
+            {
+                $pull: { connectedIDs: senderID },
+            }
+        )
+
+        const deleteMessages = Message.deleteMany({
+            $or: [
+                { senderID: senderID, receiverID: receiverID },
+                { senderID: receiverID, receiverID: senderID }
+            ]
+        })
+
+        await Promise.all([senderUpdate, receiverUpdate, deleteMessages]);
+
+        return res.json({
+            status: 'success',
+            message: `Removed connection`
+        })
+    }
+    catch (e) {
+        console.log(e.message);
+        return res.json({
+            success: 'fail',
+            message: e.message
+        });
+    }
+})
+
 router.get('/cancel_request/:receiverID/:senderID', authMiddleware, async (req, res) => {
     const { senderID, receiverID } = req.params;
 
@@ -230,9 +279,6 @@ router.get('/check/:remoteID', authMiddleware, async (req, res) => {
             })
 
             
-            
-
-
         if (user.connectedIDs.map(id => id.toString()).includes(remoteID.toString())) {
             return res.json({
                 status: 'success',

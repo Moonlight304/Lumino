@@ -77,6 +77,29 @@ export default function UserPage() {
         }
     }
 
+    async function handleRemoveConnection() {
+        try {
+            const response = await axios.get(`${server_url}/message/remove_connection/${globalUserID}/${user?._id}`, {
+                headers: {
+                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
+                }
+            });
+            const data = response.data;
+
+            if (data.status === 'success') {
+                setConnectionStatus('Nothing');
+                toast.success(data.message, toastConfig);
+            }
+            else {
+                toast.error(data.message, toastConfig);
+            }
+        }
+        catch (e) {
+            console.error(e.message);
+            toast.error('Oops.. an error occurred', toastConfig);
+        }
+    }
+
     useEffect(() => {
         async function getUser() {
             try {
@@ -174,8 +197,10 @@ export default function UserPage() {
                                             {
                                                 connectionStatus === 'Connected'
                                                     ?
-                                                    <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
-                                                        Connected
+                                                    <button
+                                                        onClick={handleRemoveConnection}
+                                                        className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out py-2 px-4 rounded-lg flex items-center justify-center">
+                                                        Remove Connection
                                                     </button>
                                                     :
                                                     connectionStatus === 'Sent'
