@@ -27,6 +27,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { Link } from 'react-router-dom';
 import { toast } from 'react-hot-toast'
 import toastConfig from '../configs/toastConfig'
@@ -239,12 +245,34 @@ export default function PostCard({ post, setPosts }) {
                                 <p className="text-sm text-[#BDBDBD]"> {timeAgo} </p>
 
                                 <div className='cursor-pointer'>
-                                    {post?.visibility === 'everyone'
-                                        ?
-                                        <CiGlobe className='w-5 h-5' />
-                                        :
-                                        <GoPeople className='w-5 h-5' />
-                                    }
+                                    <TooltipProvider>
+
+                                        {post?.visibility === 'everyone'
+                                            ?
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="p-2 rounded-full">
+                                                        <CiGlobe className="w-5 h-5" />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent className='bg-white text-black'>
+                                                    <p> Visible to everyone </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                            :
+                                            <Tooltip>
+                                                <TooltipTrigger asChild>
+                                                    <div className="p-2 rounded-full">
+                                                        <GoPeople className='w-5 h-5' />
+                                                    </div>
+                                                </TooltipTrigger>
+                                                <TooltipContent className='bg-white text-black'>
+                                                    <p> Visible to Connections only </p>
+                                                </TooltipContent>
+                                            </Tooltip>
+                                        }
+
+                                    </TooltipProvider>
                                 </div>
                             </div>
                         </div>

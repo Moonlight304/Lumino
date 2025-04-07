@@ -26,6 +26,7 @@ import handleFileChange from "@/helpers/handleFileChange";
 import { toast } from 'react-hot-toast';
 import toastConfig from "@/configs/toastConfig";
 import { Trash2 } from "lucide-react";
+import ButtonLoader from "@/helpers/ButtonLoader";
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -35,8 +36,11 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
     const [body, setBody] = useState('');
     const [imageURL, setImageURL] = useState('');
     const [visibility, setVisibility] = useState('everyone');
+    const [isLoading, setIsLoading] = useState(false);
 
     async function handleNewPost() {
+        setIsLoading(true);
+
         try {
             const response = await axios.post(`${server_url}/posts/new_post`,
                 { body, imageURL, visibility },
@@ -64,6 +68,9 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
         catch (e) {
             toast.error('Oops try again', toastConfig);
             console.log(e.message);
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
@@ -125,7 +132,7 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                 <label htmlFor="feed_image" className="cursor-pointer">
                     <FaImage
                         className="w-8 h-8 hover:opacity-70"
-                        // onChange={(e) => handleFileChange(e, 'feed')}
+                    // onChange={(e) => handleFileChange(e, 'feed')}
                     />
                 </label>
 
@@ -160,9 +167,22 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                         </DropdownMenu>
                     </div>
 
-                    <div onClick={handleNewPost}>
-                        <Button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"> Post </Button>
-                    </div>
+
+                    {isLoading
+                        ?
+                        <Button
+                            className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white flex justify-center"
+                        >
+                            <ButtonLoader />
+                        </Button>
+                        :
+                        <Button
+                            onClick={handleNewPost}
+                            className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"
+                        >
+                            Post
+                        </Button>
+                    }
                 </div>
             </div>
         </div>

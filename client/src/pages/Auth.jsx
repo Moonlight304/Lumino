@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
 import { userIDState, displayNameState, avatarURLState } from '../configs/atoms';
+import ButtonLoader from '@/helpers/ButtonLoader';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -19,6 +20,8 @@ export default function Auth() {
 
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         display_name: '',
@@ -38,6 +41,7 @@ export default function Auth() {
 
     async function handleAuthorisation(e) {
         e.preventDefault();
+        setIsLoading(true);
 
         try {
             if (isLogin) {
@@ -86,6 +90,9 @@ export default function Auth() {
         }
         catch (e) {
             toast.error('Oops try again', toastConfig);
+        }
+        finally {
+            setIsLoading(false);
         }
     }
 
@@ -188,12 +195,21 @@ export default function Auth() {
                         </div>
                     }
 
-                    <button
-                        type="submit"
-                        className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
-                    >
-                        {isLogin ? 'Log In' : 'Sign up'}
-                    </button>
+                    {isLoading
+                        ?
+                        <button
+                            className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300 flex justify-center"
+                        >
+                            <ButtonLoader />
+                        </button>
+                        :
+                        <button
+                            type="submit"
+                            className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
+                        >
+                            {isLogin ? 'Log In' : 'Sign up'}
+                        </button>
+                    }
                 </form>
                 <p className="mt-4 text-center text-white">
                     {

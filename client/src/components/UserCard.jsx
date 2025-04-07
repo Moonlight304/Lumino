@@ -11,13 +11,18 @@ import { countryCodes } from '../configs/countryCodes';
 import { userIDState } from "../configs/atoms";
 import { Link } from "react-router-dom";
 import { FaGamepad, FaDesktop, FaPlaystation, FaXbox, FaAndroid, FaApple, FaHeadset, FaMicrophone, FaKeyboard, FaFire, FaUserFriends } from 'react-icons/fa';
+import ButtonLoader from "@/helpers/ButtonLoader";
+import { useState } from "react";
 
 const server_url = import.meta.env.VITE_server_url;
 
 export default function UserCard({ user, setUsers }) {
     const [globalUserID] = useRecoilState(userIDState);
+    const [isLoading, setIsLoading] = useState(false);
 
     async function handleRequest() {
+        setIsLoading(true);
+
         try {
             const response = await axios.get(`${server_url}/message/send_request/${globalUserID}/${user?._id}`, {
                 headers: {
@@ -38,6 +43,9 @@ export default function UserCard({ user, setUsers }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
+        finally {
+            setIsLoading(false);
+        }
     }
 
     const platformIcons = {
@@ -50,16 +58,16 @@ export default function UserCard({ user, setUsers }) {
     };
 
     const playstyleIcons = {
-        Casual: <FaUserFriends className="mr-2 text-yellow-400" />,  // More social & friendly
-        Competitive: <FaFire className="mr-2 text-red-500" />, // Represents intensity
-        Mixed: <FaGamepad className="mr-2 text-purple-500" />, // Balanced approach
+        Casual: <FaUserFriends className="mr-2 text-yellow-400" />,
+        Competitive: <FaFire className="mr-2 text-red-500" />,
+        Mixed: <FaGamepad className="mr-2 text-purple-500" />,
         Any: <FaGamepad className="mr-2 text-gray-500" />,
     };
 
     const communicationIcons = {
-        Voice: <FaMicrophone className="mr-2 text-blue-500" />, // Clearer for voice
-        Text: <FaKeyboard className="mr-2 text-green-500" />, // More accurate than comments
-        Both: <FaHeadset className="mr-2 text-purple-500" />, // Headset implies both voice & chat
+        Voice: <FaMicrophone className="mr-2 text-blue-500" />,
+        Text: <FaKeyboard className="mr-2 text-green-500" />,
+        Both: <FaHeadset className="mr-2 text-purple-500" />,
         Any: <FaHeadset className="mr-2 text-gray-500" />,
     };
 
@@ -120,10 +128,17 @@ export default function UserCard({ user, setUsers }) {
 
             </div>
             <div className="px-6 pb-6">
-                <button onClick={handleRequest} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out w-full py-2 px-4 rounded-lg flex items-center justify-center">
-                    <BsFillPersonPlusFill className="mr-2" />
-                    Connect
-                </button>
+                {isLoading
+                    ?
+                    <button className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out w-full py-2 px-4 rounded-lg flex items-center justify-center">
+                        <ButtonLoader />
+                    </button>
+                    :
+                    <button onClick={handleRequest} className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out w-full py-2 px-4 rounded-lg flex items-center justify-center">
+                        <BsFillPersonPlusFill className="mr-2" />
+                        Connect
+                    </button>
+                }
             </div>
         </div>
     );
