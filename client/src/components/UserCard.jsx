@@ -84,19 +84,24 @@ export default function UserCard({ user, setUsers }) {
                     ) : (
                         <CgProfile className="min-w-28 min-h-28 rounded-full border-2 border-secondary object-cover mr-4" />
                     )}
-                    <div>
-                        <Link to={`/user/${user?.display_name}`}> <h2 className="text-xl font-semibold text-gray-300 dark:text-white">{user?.display_name}</h2> </Link>
+                    <div className="max-w-sm rounded-lg">
+                        <div className="flex min-w-0">
+                            <Link to={`/user/${user?.display_name}`} className="min-w-0 flex-1">
+                                <h2 className="text-xl font-semibold text-gray-300 dark:text-white truncate">{user?.display_name}</h2>
+                            </Link>
+                        </div>
+
                         <div className="flex items-center mt-1">
                             {user.country ? (
                                 <img
                                     src={`https://flagsapi.com/${countryCodes[user?.country]}/flat/24.png`}
                                     alt={user?.country}
-                                    className="mr-2"
+                                    className="mr-2 flex-shrink-0"
                                 />
                             ) : (
-                                <span className="mr-2">🌍</span>
+                                <span className="mr-2 flex-shrink-0">🌍</span>
                             )}
-                            <span className="text-lg text-gray-400 dark:text-gray-300">{user?.age} </span>
+                            <span className="text-lg text-gray-400 dark:text-gray-300">{user?.age}</span>
                         </div>
                     </div>
                 </div>

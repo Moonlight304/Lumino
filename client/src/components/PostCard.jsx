@@ -174,7 +174,7 @@ export default function PostCard({ post, setPosts }) {
 
     async function handleDeletePost() {
         try {
-            const response = await axios.get(`${server_url}/posts/delete_post/${post?._id}`, {
+            const response = await axios.get(`${server_url}/posts/delete_post/${post?._id}/${post?.userID}`, {
                 headers: {
                     Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
                 }
@@ -277,6 +277,8 @@ export default function PostCard({ post, setPosts }) {
                             </div>
                         </div>
                     </div>
+
+                    <button type="button" onClick={handleDeletePost}> DELETE </button>
 
                     {globalUserID === post?.userID &&
                         <div className='flex items-center gap-3 absolute right-5 group'>

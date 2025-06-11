@@ -189,10 +189,10 @@ router.post('/edit_post/:postID', authMiddleware, async (req, res) => {
     }
 })
 
-router.get('/delete_post/:postID', authMiddleware, async (req, res) => {
+router.get('/delete_post/:postID/:userID', authMiddleware, async (req, res) => {
     try {
-        const { userID } = req.user;
-        const { postID } = req.params;
+        // const { userID } = req.user;
+        const { userID, postID } = req.params;
 
         if (!postID)
             return res.json({

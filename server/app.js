@@ -20,7 +20,7 @@ const authRoute = require('./routes/authRoute');
 const messageRoute = require('./routes/messageRoute');
 const usersRoute = require('./routes/usersRoute');
 const postRoute = require('./routes/postRoute');
-
+const devRoute = require('./routes/devRoute.js');
 
 
 mongoose.connect(process.env.dbURL)
@@ -38,6 +38,7 @@ app.use('/auth', authRoute);
 app.use('/message', messageRoute);
 app.use('/users', usersRoute);
 app.use('/posts', postRoute);
+app.use('/dev', devRoute);
 
 
 
@@ -49,5 +50,5 @@ app.get('/', (req, res) => {
 
 
 server.listen(PORT, () => {
-    console.log(`Running on port ${PORT}`);
+    console.log(`Running server : http://localhost:${PORT}`);
 })

@@ -1,7 +1,9 @@
 /works.txt
+/dump
 
 /server/node_modules
 /server/.env
+/server/fakeUserData.txt
 
 
 /client/node_modules
