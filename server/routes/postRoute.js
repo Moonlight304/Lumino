@@ -277,7 +277,7 @@ router.get('/like/:postID', authMiddleware, async (req, res) => {
                     _id: new mongoose.mongo.ObjectId(),
                     typeOfNotification: 'like',
                     message: `${display_name} liked your post!`,
-                    action_url: ''
+                    action_url: `/user/${display_name}`
                 };
 
                 const user = await User.findById(post?.userID);
