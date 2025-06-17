@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from "react";
 import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
@@ -9,8 +8,7 @@ import ChatWindow from "../components/ChatWindow";
 import { useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '../configs/atoms';
-
-const server_url = import.meta.env.VITE_server_url;
+import { API } from '@/configs/api';
 
 export default function Connections() {
     const [globalUserID] = useRecoilState(userIDState);
@@ -21,9 +19,7 @@ export default function Connections() {
 
     async function handleChatWindow() {
         try {
-            const response = await axios.get(`${server_url}/message/${remoteUserID}`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-            });
+            const response = await API(`/message/${remoteUserID}`, 'GET');
             setMessages(response.data.allMessages);
         }
         catch (e) {
@@ -37,12 +33,14 @@ export default function Connections() {
     }, [remoteUserID]);
 
     const navigate = useNavigate();
+
     useEffect(() => {
         if (!globalUserID) {
             navigate('/');
             toast.error('Cannot access page', toastConfig);
         }
-    }, [globalUserID]);
+
+    }, [globalUserID, navigate]);
 
     return (
         <div className="bg-background min-h-fit text-white">

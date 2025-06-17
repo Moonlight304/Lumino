@@ -37,7 +37,8 @@ export default function ForgotPassword() {
             navigate('/');
             toast.error('Cannot access page', toastConfig);
         }
-    }, [globalUserID]);
+
+    }, [globalUserID, navigate]);
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] flex flex-col justify-center items-center p-4">

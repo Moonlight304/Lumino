@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
@@ -9,8 +8,8 @@ import toastConfig from '../configs/toastConfig';
 
 import { userIDState, displayNameState, avatarURLState } from '../configs/atoms';
 import ButtonLoader from '@/helpers/ButtonLoader';
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function Auth() {
     const [isLogin, setIsLogin] = useState(true);
@@ -36,7 +35,8 @@ export default function Auth() {
             navigate('/discover');
             toast.error('Cannot access page', toastConfig);
         }
-    }, []);
+
+    }, [globalUserID, navigate]);
 
 
     async function handleAuthorisation(e) {
@@ -47,11 +47,12 @@ export default function Auth() {
             if (isLogin) {
                 const { email, password } = formData;
 
-                const response = await axios.post(`${server_url}/auth/login/`, { email, password });
+                // const response = await axios.post(`${server_url}/auth/login/`, { email, password });
+                const response = await API('/auth/login', 'POST', { email, password });
                 const data = response.data;
 
                 if (data.status === 'success') {
-                    sessionStorage.setItem('jwt_token', data.jwt_token);
+                    localStorage.setItem('access_token', data.access_token);
                     setGlobalUserID(data.userID);
                     setGlobalDisplayName(data.display_name);
                     setGlobalAvatarURL(data.avatarURL);
@@ -72,11 +73,13 @@ export default function Auth() {
 
                 console.log({ display_name, email, password });
 
-                const response = await axios.post(`${server_url}/auth/signup/`, { display_name, email, password });
+                // const response = await axios.post(`${server_url}/auth/signup/`, { display_name, email, password });
+                
+                const response = await API('/auth/signup', 'POST', { display_name, email, password });
                 const data = response.data;
 
                 if (data.status === 'success') {
-                    sessionStorage.setItem('jwt_token', data.jwt_token);
+                    localStorage.setItem('access_token', data.access_token);
                     setGlobalUserID(data.userID);
                     setGlobalDisplayName(data.display_name);
 

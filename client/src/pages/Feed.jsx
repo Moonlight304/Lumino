@@ -19,6 +19,7 @@ export default function Feed() {
     const [isLoading, setIsLoading] = useState(true);
     const [globalUserID] = useRecoilState(userIDState);
     const [posts, setPosts] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function getPosts() {
@@ -50,13 +51,12 @@ export default function Feed() {
         getPosts();
     }, []);
 
-    const navigate = useNavigate();
     useEffect(() => {
         if (!globalUserID) {
             navigate('/');
             toast.error('Cannot access page', toastConfig);
         }
-    }, [globalUserID]);
+    }, [globalUserID, navigate]);
 
     return (
         <>

@@ -110,7 +110,6 @@ export default function Landing() {
     useEffect(() => {
         if (globalUserID) {
             navigate('/discover');
-            toast.error('Cannot access page', toastConfig);
         }
 
         // Responsive check

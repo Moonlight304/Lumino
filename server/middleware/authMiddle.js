@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const JWT_SECRET = process.env.JWT_SECRET_CODE;
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
 
 function authMiddle(req, res, next) {
     try {
@@ -11,16 +11,16 @@ function authMiddle(req, res, next) {
                 message: 'Not authorised',
             });
 
-        const jwt_token = authHeader.split(' ')[1];
+        const access_token = authHeader.split(' ')[1];
 
-        if (!jwt_token)
+        if (!access_token)
             return res.json({
                 status: 'fail',
                 message: 'no token found',
             })
 
         
-        const decodedObj = jwt.verify(jwt_token, JWT_SECRET);
+        const decodedObj = jwt.verify(access_token, ACCESS_SECRET);
         req.user = decodedObj;
 
         next();

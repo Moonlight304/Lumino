@@ -1,6 +1,3 @@
-"use client"
-
-import axios from "axios"
 import { useEffect, useState } from "react"
 import Navbar from "../components/Navbar"
 import { useRecoilState } from "recoil"
@@ -10,8 +7,8 @@ import { toast } from 'react-hot-toast'
 import toastConfig from "@/configs/toastConfig"
 import { Bell, Check, ExternalLink, Loader2, Trash2 } from "lucide-react"
 import Loading from "@/components/Loading"
+import { API } from "@/configs/api"
 
-const server_url = import.meta.env.VITE_server_url
 
 export default function Notifications() {
     const [isLoading, setIsLoading] = useState(true)
@@ -23,11 +20,7 @@ export default function Notifications() {
             setIsLoading(true)
 
             try {
-                const response = await axios.get(`${server_url}/users/getUser/${globalUserID}`, {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
-                    },
-                })
+                const response = await API(`/users/getUser/${globalUserID}`, 'GET');
                 const data = response.data
 
                 if (data.status === "success") {
@@ -99,7 +92,7 @@ export default function Notifications() {
             navigate('/');
             toast.error('Cannot access page', toastConfig);
         }
-    }, [globalUserID]);
+    }, [globalUserID, navigate]);
 
     return (
         <>

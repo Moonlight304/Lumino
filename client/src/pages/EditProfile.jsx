@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Edit, Save, Upload } from 'lucide-react';
-import axios from 'axios';
 import toast from 'react-hot-toast';
 import toastConfig from '@/configs/toastConfig';
 import Navbar from '@/components/Navbar';
@@ -18,8 +17,8 @@ import { displayNameState, userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
 import handleFileChange from '@/helpers/handleFileChange';
 import { useNavigate } from 'react-router-dom';
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function EditProfile({ onProfileUpdate }) {
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
@@ -42,13 +41,12 @@ export default function EditProfile({ onProfileUpdate }) {
         favourite_genres: ""
     });
 
+    const navigate = useNavigate();
 
     useEffect(() => {
         async function getUser() {
             try {
-                const response = await axios.get(`${server_url}/users/me`, {
-                    headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-                });
+                const response = await API('/users/me', 'GET');
                 const fetchedUser = response.data.user;
 
                 setUser(fetchedUser);
@@ -85,7 +83,6 @@ export default function EditProfile({ onProfileUpdate }) {
         setFormData((prev) => ({ ...prev, [name]: value }));
     }
 
-    const navigate = useNavigate();
 
     async function handleEditProfile(e) {
         e.preventDefault();
@@ -114,7 +111,8 @@ export default function EditProfile({ onProfileUpdate }) {
             navigate('/');
             toast.error('Cannot access page', toastConfig);
         }
-    }, [globalUserID]);
+
+    }, [globalUserID, navigate]);
 
     return (
         <>

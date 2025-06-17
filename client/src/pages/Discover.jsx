@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useRecoilState } from "recoil"
-import axios from "axios"
 import { toast } from 'react-hot-toast'
 
 import { userIDState } from "../configs/atoms"
@@ -21,9 +20,8 @@ import { Filter, Loader2, Minus, Plus, Users } from "lucide-react"
 import { countryCodes } from '../configs/countryCodes';
 import Filters from "@/components/Filters"
 import Loading from "@/components/Loading"
+import { API } from "@/configs/api"
 
-
-const server_url = import.meta.env.VITE_server_url
 
 export default function Discover() {
     const [isLoading, setIsLoading] = useState(true);
@@ -42,17 +40,10 @@ export default function Discover() {
         communication_preference: "",
     })
 
-    const navigate = useNavigate()
-
-
     async function fetchUsers(filterParams) {
         setIsLoading(true)
         try {
-            const response = await axios.get(`${server_url}/users/discover?${filterParams}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
-                },
-            })
+            const response = await API(`/users/discover?${filterParams}`, 'GET', null);
             const data = response.data
 
             if (data.status === "success") {
@@ -69,12 +60,15 @@ export default function Discover() {
             setIsLoading(false)
         }
     }
+    
+    const navigate = useNavigate()
 
     useEffect(() => {
         if (!globalUserID) {
             navigate("/");
             toast.error('Cannot access page', toastConfig);
         }
+
         fetchUsers("")
     }, [globalUserID, navigate])
 

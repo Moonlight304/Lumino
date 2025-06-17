@@ -6,7 +6,8 @@ const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 const nodemailer = require('nodemailer');
 
-const JWT_SECRET = process.env.JWT_SECRET_CODE;
+const ACCESS_SECRET = process.env.ACCESS_SECRET;
+const REFRESH_SECRET = process.env.REFRESH_SECRET;
 
 const User = require('../models/User');
 const authMiddleware = require('../middleware/authMiddle');
@@ -34,23 +35,45 @@ router.post('/signup', async (req, res) => {
         const salt = await bcrypt.genSalt();
         const passwordHash = await bcrypt.hash(password, salt);
 
-        const newUser = User({ display_name, email, passwordHash });
+        const newUser = new User({ display_name, email, passwordHash });
         const savedUser = await newUser.save();
 
+        const userDetails = {
+            userID: savedUser._id,
+            display_name: savedUser.display_name,
+            avatarURL: ''
+        };
 
-        const jwt_token = jwt.sign(
+
+        const access_token = jwt.sign(
+            userDetails,
+            ACCESS_SECRET,
             {
-                userID: savedUser._id,
-                display_name: savedUser.display_name,
-                avatarURL: ''
-            },
-            JWT_SECRET
+                expiresIn: '15m'
+            }
         );
+
+        const refresh_token = jwt.sign(
+            userDetails,
+            REFRESH_SECRET,
+            {
+                expiresIn: '7d'
+            }
+        );
+
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        })
+
 
         return res.json({
             status: 'success',
             message: 'Signed up',
-            jwt_token,
+            access_token,
             userID: savedUser._id,
             display_name: savedUser.display_name,
             avatarURL: ''
@@ -91,27 +114,91 @@ router.post('/login', async (req, res) => {
                 message: 'Email or Password invalid',
             })
 
-        const jwt_token = jwt.sign(
+
+        const userDetails = {
+            userID: existingUser._id,
+            display_name: existingUser.display_name,
+            avatarURL: existingUser.profile_picture
+        };
+
+
+        const access_token = jwt.sign(
+            userDetails,
+            ACCESS_SECRET,
             {
-                userID: existingUser._id,
-                display_name: existingUser.display_name,
-                avatarURL: existingUser.profile_picture
-            },
-            JWT_SECRET
+                expiresIn: '15m'
+            }
         );
+
+        const refresh_token = jwt.sign(
+            userDetails,
+            REFRESH_SECRET,
+            {
+                expiresIn: '7d'
+            }
+        );
+
+        res.cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/',
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
 
         return res.json({
             status: 'success',
             message: 'Logged in',
-            jwt_token,
+            access_token,
             userID: existingUser._id,
             display_name: existingUser.display_name,
             avatarURL: existingUser.profile_picture
         })
     }
     catch (e) {
-        console.log(error.message);
+        console.log(e.message);
         return res.json({
+            status: 'fail',
+            message: e.message,
+        })
+    }
+})
+
+router.get('/refresh', (req, res) => {
+    const token = req.cookies.refresh_token;
+
+    if (!token) return res.status(401).json({ message: 'No token' });
+
+    try {
+        const payload = jwt.verify(token, REFRESH_SECRET);
+
+        const access_token = jwt.sign(payload, ACCESS_SECRET, { expiresIn: '15m' });
+
+        res.json({ access_token });
+    }
+    catch (err) {
+        res.status(403).json({ message: 'Invalid token' });
+    }
+})
+
+router.get('/logout', (req, res) => {
+    try {
+        res.clearCookie('refresh_token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+            path: '/',
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Logged out successfully',
+        });
+    }
+    catch (e) {
+        console.log(e.message);
+        return res.status(500).json({
             status: 'fail',
             message: e.message,
         })
@@ -180,7 +267,7 @@ router.post("/reset-password", async (req, res) => {
         // Hash new password
         const salt = await bcrypt.genSalt();
         const newPasswordHash = await bcrypt.hash(password, salt);
-        
+
         user.passwordHash = newPasswordHash;
         await user.save();
 

@@ -15,6 +15,7 @@ import {
 import { Button } from "./ui/button";
 import toast from "react-hot-toast";
 import toastConfig from "@/configs/toastConfig";
+import { API } from "@/configs/api";
 
 
 
@@ -27,13 +28,21 @@ export default function Navbar() {
 
     const navigate = useNavigate();
 
-    function handleLogout() {
+    async function handleLogout() {
         try {
-            sessionStorage.removeItem('jwt_token');
-            setGlobalUserID(null);
+            
+            const response = await API('/auth/logout', 'GET');
 
-            navigate('/');
-            toast.success('Logged out', toastConfig)
+            if (response.status === 500) {
+                localStorage.removeItem('access_token');
+                setGlobalUserID(null);
+    
+                navigate('/');
+                toast.success('Logged out', toastConfig)
+            }
+            else {
+                toast.error('Error');
+            }
         }
         catch (e) {
             console.log(e.message);
