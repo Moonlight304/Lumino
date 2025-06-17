@@ -73,7 +73,7 @@ export default function Feed() {
                         posts.map((post, index) => {
                             return (
                                 <PostCard
-                                    key={index}
+                                    key={post?._id}
                                     post={post}
                                     setPosts={setPosts}
                                 />

@@ -84,10 +84,12 @@ export default function UserCard({ user, setUsers }) {
                     ) : (
                         <CgProfile className="min-w-28 min-h-28 rounded-full border-2 border-secondary object-cover mr-4" />
                     )}
-                    <div className="max-w-sm rounded-lg">
+                    <div className="flex-1 min-w-0">
                         <div className="flex min-w-0">
-                            <Link to={`/user/${user?.display_name}`} className="min-w-0 flex-1">
-                                <h2 className="text-xl font-semibold text-gray-300 dark:text-white truncate">{user?.display_name}</h2>
+                            <Link to={`/user/${user?.display_name}`} className="min-w-0 w-full">
+                                <h2 className="text-xl font-semibold text-gray-300 dark:text-white truncate">
+                                    {user?.display_name}
+                                </h2>
                             </Link>
                         </div>
 

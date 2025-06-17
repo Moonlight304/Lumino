@@ -128,6 +128,7 @@ export default function Notifications() {
                                     </div>
                                     <div className="flex flex-wrap items-center gap-2 ml-auto">
                                         <Link
+                                            target="_blank"
                                             to={notification?.action_url}
                                             className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white transition duration-300 ease-in-out h-9 px-4 py-2"
                                         >

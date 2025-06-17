@@ -1,7 +1,7 @@
 import axios from 'axios'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useCallback } from 'react'; // Import useCallback
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt, FaRegBookmark, FaBookmark } from 'react-icons/fa'
+import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt, FaRegBookmark, FaBookmark, FaClipboard } from 'react-icons/fa'
 import { CiGlobe, CiMedicalClipboard } from "react-icons/ci";
 import { GoPeople } from "react-icons/go";
 import { FaImage } from "react-icons/fa6";
@@ -40,25 +40,26 @@ import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
-import { Clipboard, Edit, Settings, Trash } from 'lucide-react';
+import { Clipboard, ClipboardCheck, ClipboardCheckIcon, ClipboardIcon, Edit, Settings, Trash } from 'lucide-react';
 import EditPostDialog from './EditPostDialog';
 import { Input } from '@/components/ui/input';
 import fetchUser from '@/helpers/fetchUser';
 
 const server_url = import.meta.env.VITE_server_url;
 
-export default function PostCard({ post, setPosts }) {
+const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with React.memo
     const [globalUserID] = useRecoilState(userIDState);
     const [timeAgo, setTimeAgo] = useState(null);
     const [likeCount, setLikeCount] = useState(0);
     const [isLiked, setIsLiked] = useState(false);
     const [isSaved, setIsSaved] = useState(false);
-
+    const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [postUsername, setPostUsername] = useState(null);
     const [postUserAvatar, setPostUserAvatar] = useState(null);
-    const [dropdownOpen, setDropdownOpen] = useState(false)
+    const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    async function getLikeInclude() {
+    // Use useCallback for functions passed as props or event handlers
+    const getLikeInclude = useCallback(async () => {
         try {
             const response = await axios.get(`${server_url}/posts/${post?._id}/checkLiked`,
                 {
@@ -80,9 +81,9 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }
+    }, [post?._id]);
 
-    async function toggleLike() {
+    const toggleLike = useCallback(async () => {
         try {
             const response = await axios.get(`${server_url}/posts/${isLiked ? 'dislike' : 'like'}/${post?._id}`, {
                 headers: {
@@ -103,9 +104,9 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }
+    }, [isLiked, post?._id]);
 
-    async function getSavedInclude() {
+    const getSavedInclude = useCallback(async () => {
         try {
             const response = await axios.get(`${server_url}/posts/checkSaved/${post?._id}`, {
                 headers: {
@@ -123,9 +124,9 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }
+    }, [post?._id]);
 
-    async function toggleSavePost() {
+    const toggleSavePost = useCallback(async () => {
         try {
             const response = await axios.get(`${server_url}/posts/${isSaved ? 'deleteSavedPost' : 'savePost'}/${post?._id}`, {
                 headers: {
@@ -146,14 +147,18 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }
+    }, [isSaved, post?._id]);
 
-    function handleClipboard() {
+    const [checkClipboard, setCheckClipboard] = useState(false);
+
+    const handleClipboard = useCallback(() => {
         if (!navigator.clipboard) {
             console.log('Clipboard API not supported');
             toast.error('Clipboard API not supported', toastConfig);
             return;
         }
+
+        setCheckClipboard(true);
 
         try {
             if (!post?._id) {
@@ -170,9 +175,14 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Error copying to clipboard', toastConfig);
         }
-    }
+        finally {
+            setTimeout(() => {
+                setCheckClipboard(false);
+            }, 2000);
+        }
+    }, [post?._id]);
 
-    async function handleDeletePost() {
+    const handleDeletePost = useCallback(async () => {
         try {
             const response = await axios.get(`${server_url}/posts/delete_post/${post?._id}/${post?.userID}`, {
                 headers: {
@@ -193,7 +203,7 @@ export default function PostCard({ post, setPosts }) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }
+    }, [post?._id, post?.userID, setPosts]);
 
     useEffect(() => {
 
@@ -220,7 +230,7 @@ export default function PostCard({ post, setPosts }) {
         setLikeCount(post?.likeCount);
         getSavedInclude();
         getUser();
-    }, []);
+    }, [post?.createdAt, post?.userID, getLikeInclude, setLikeCount, getSavedInclude]);
 
 
 
@@ -278,38 +288,58 @@ export default function PostCard({ post, setPosts }) {
                         </div>
                     </div>
 
-                    <button type="button" onClick={handleDeletePost}> DELETE </button>
+                    {/* <button type="button" onClick={handleDeletePost}> DELETE </button> */}
 
-                    {globalUserID === post?.userID &&
-                        <div className='flex items-center gap-3 absolute right-5 group'>
-                            <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                                <DropdownMenuTrigger asChild>
-                                    <Button className='bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white'>
-                                        <Settings
-                                            className='text-white cursor-pointer group-hover:rotate-90 transition scale-120'
-                                        />
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className={'bg-[#EEEEEE]'}>
-                                    <DropdownMenuGroup>
-                                        <DropdownMenuItem
-                                        >
-                                            <Edit className="mr-2 h-4 w-4" />
-                                            Edit
-                                        </DropdownMenuItem>
-                                        <DropdownMenuItem onClick={handleDeletePost}>
-                                            <Trash />
-                                            Delete
-                                        </DropdownMenuItem>
-                                        {/* <DropdownMenuItem>
-                                            <Clipboard />
-                                            Copy link
-                                            </DropdownMenuItem> */}
-                                    </DropdownMenuGroup>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </div>
-                    }
+
+                    <div className='flex items-center gap-3 absolute right-5 group'>
+                        <DropdownMenu modal={false}>
+                            <DropdownMenuTrigger asChild>
+                                <Button className='bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white'>
+                                    <Settings className='text-white cursor-pointer group-hover:rotate-90 transition scale-120' />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent className={'bg-[#EEEEEE]'}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <DropdownMenuGroup>
+                                    {globalUserID === post?.userID && (
+                                        <>
+                                            <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
+                                                <Edit className="mr-2 h-4 w-4" />
+                                                Edit
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={handleDeletePost}>
+                                                <Trash />
+                                                Delete
+                                            </DropdownMenuItem>
+                                        </>
+                                    )}
+
+                                    <DropdownMenuItem onClick={toggleSavePost}>
+                                        {isSaved ? (
+                                            <FaBookmark className="h-6 w-6 text-[#FF3333]" />
+                                        ) : (
+                                            <FaRegBookmark className="h-6 w-6" />
+                                        )}
+                                        
+                                        {isSaved
+                                            ? 'Saved'
+                                            : 'Save Post'
+                                        }
+                                    </DropdownMenuItem>
+
+                                    <DropdownMenuItem onClick={handleClipboard}>
+                                        {checkClipboard
+                                            ? <ClipboardCheckIcon />
+                                            : <ClipboardIcon />
+                                        }
+                                        Copy to Clipboard
+                                    </DropdownMenuItem>
+
+                                </DropdownMenuGroup>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>
                 </div>
             </div>
 
@@ -352,7 +382,7 @@ export default function PostCard({ post, setPosts }) {
                         <span>{likeCount}</span>
                     </button>
 
-                    <button
+                    {/* <button
                         className='flex items-center space-x-1 text-[#BDBDBD]'
                         onClick={toggleSavePost}
                     >
@@ -362,9 +392,17 @@ export default function PostCard({ post, setPosts }) {
                             <FaRegBookmark className="h-6 w-6" />
                         )}
                         <span>{isSaved ? 'Saved' : 'Save'}</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
+            <EditPostDialog
+                post={post}
+                isOpen={isEditDialogOpen}
+                setIsOpen={setIsEditDialogOpen}
+                setPosts={setPosts}
+            />
         </div >
     )
-}
+});
+
+export default PostCard;

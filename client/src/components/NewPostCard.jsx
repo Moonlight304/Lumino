@@ -52,13 +52,16 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
             )
             const data = response.data;
 
-            if (data.status === 'success') {
+            if (data.status === 'success' && data.newPost && data.newPost._id) {
                 toast.success('Posted', toastConfig);
 
                 setImageURL('');
                 setBody('');
 
-                setPosts((prev) => [data.newPost, ...prev]);
+                setPosts((prevPosts) => {
+                    const newPosts = [data.newPost, ...prevPosts];
+                    return newPosts;
+                })
             }
             else {
                 toast.error(data.message, toastConfig);
