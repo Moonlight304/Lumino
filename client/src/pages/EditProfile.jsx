@@ -11,16 +11,18 @@ import { countryNameToCode } from '@/configs/countryNameToCode';
 import { useRecoilState } from 'recoil';
 import { displayNameState, userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
-import handleFileChange from '@/helpers/handleFileChange';
 import { useNavigate } from 'react-router-dom';
 import { API } from '@/configs/api';
 import Loading from '@/components/Loading';
+import removeOldImage from '@/helpers/removeOldImage';
+import ButtonLoader from '@/helpers/ButtonLoader';
 
 
 export default function EditProfile({ onProfileUpdate }) {
     const [globalUserID, setGlobalUserID] = useRecoilState(userIDState);
     const [globalDisplayName] = useRecoilState(displayNameState);
     const [isLoading, setIsLoading] = useState(true);
+    const [editIsLoading, setEditIsLoading] = useState(false);
     const [user, setUser] = useState(null);
 
     const [formData, setFormData] = useState({
@@ -37,6 +39,8 @@ export default function EditProfile({ onProfileUpdate }) {
         favourite_games: "",
         favourite_genres: ""
     });
+    const [imageFile, setImageFile] = useState(null);
+    const [oldImageURL, setOldImageURL] = useState(null);
 
     const navigate = useNavigate();
 
@@ -64,6 +68,7 @@ export default function EditProfile({ onProfileUpdate }) {
                     steam_id: fetchedUser?.steam_id || '',
                     profile_picture: fetchedUser?.profile_picture || '',
                 });
+                setOldImageURL(fetchedUser?.profile_picture);
             }
             catch (e) {
                 console.error(e.message);
@@ -85,9 +90,38 @@ export default function EditProfile({ onProfileUpdate }) {
 
     async function handleEditProfile(e) {
         e.preventDefault();
+        setEditIsLoading(true);
+
+        let updatedProfilePicture = formData.profile_picture;
 
         try {
-            const response = await API(`/users/edit_user/${globalUserID}`, 'POST', formData);
+            // If user selected a new image
+            if (imageFile) {
+                // Remove old image if it exists
+                if (oldImageURL) {
+                    await removeOldImage(oldImageURL);
+                }
+
+                const form = new FormData();
+                form.append('imageFile', imageFile);
+
+                // Send folder as query param
+                const imageURLResponse = await API('/images/upload?folder=avatars', 'POST', form);
+
+                updatedProfilePicture = imageURLResponse.data.secure_url;
+            }
+            // If user removed profile picture, clicked x
+            else if (formData.profile_picture === "" && oldImageURL !== "") {
+                await removeOldImage(oldImageURL);
+                updatedProfilePicture = '';
+            }
+
+            const updatedFormData = {
+                ...formData,
+                profile_picture: updatedProfilePicture,
+            };
+
+            const response = await API(`/users/edit_user/${globalUserID}`, 'POST', updatedFormData);
             const data = response.data;
 
             if (data.status === 'success') {
@@ -97,10 +131,14 @@ export default function EditProfile({ onProfileUpdate }) {
             }
         }
         catch (error) {
-            console.log(error.message)
+            console.log(error.message);
             toast.error('Failed to update profile', toastConfig);
         }
-    };
+        finally {
+            setEditIsLoading(false);
+        }
+    }
+
 
     return (
         <>
@@ -114,42 +152,56 @@ export default function EditProfile({ onProfileUpdate }) {
                             <Card className="w-full max-w-2xl bg-gray-900 shadow-lg border border-red-500">
                                 <CardHeader className="text-center">
                                     <CardTitle className="text-4xl text-red-500"> Edit Your Profile {globalDisplayName} </CardTitle>
+                                    {/* <Button onClick={() => console.log(imageFile)}> Image FILE </Button>
+                                    <Button onClick={() => console.log(formData)}> Form Data </Button>
+                                    <Button onClick={() => console.log(oldImageURL)}> OLD </Button>
+                                    <Button onClick={() => console.log(formData.profile_picture === "" && oldImageURL !== "")}> CLICK ME </Button> */}
                                 </CardHeader>
                                 <CardContent className={'max-md:px-2'}>
                                     <form onSubmit={handleEditProfile} className="space-y-6">
                                         {/* Profile Picture */}
                                         <div className="flex flex-col items-center space-y-4">
                                             <Label htmlFor="profile_picture" className="text-red-400">Profile Picture</Label>
-                                            <label htmlFor="profile_picture" className="cursor-pointer">
-
-                                                {formData.profile_picture ? (
-                                                    <div className="relative w-36 h-36 rounded-full border-4 border-red-500 flex items-center justify-center">
-                                                        <img src={formData.profile_picture} alt="Profile" className="w-full h-full rounded-full object-cover" />
-
-                                                        <button
-                                                            onClick={() => setFormData((prev) => ({ ...prev, profile_picture: '' }))}
-                                                            className="absolute bottom-1 border-2 border-white rounded-full"
-                                                        >
-                                                            ❌
-                                                        </button>
-                                                    </div>
-
-                                                ) : (
-                                                    <div className="w-32 h-32 rounded-full border-4 border-red-500 flex items-center justify-center">
-                                                        <CgProfile className="w-20 h-20 text-red-500" />
-                                                    </div>
+                                            <div className="relative w-36 h-36 flex items-center justify-center">
+                                                <label htmlFor="profile_picture" className="cursor-pointer w-full h-full">
+                                                    {formData.profile_picture ? (
+                                                        <img src={formData.profile_picture} alt="Profile" className="w-full h-full rounded-full object-cover border-4 border-red-500" />
+                                                    ) : (
+                                                        <div className="w-32 h-32 rounded-full border-4 border-red-500 flex items-center justify-center">
+                                                            <CgProfile className="w-20 h-20 text-red-500" />
+                                                        </div>
+                                                    )}
+                                                </label>
+                                                {formData.profile_picture && (
+                                                    <button
+                                                        onClick={() => {
+                                                            setImageFile(null);
+                                                            setFormData((prev) => ({ ...prev, profile_picture: '' }));
+                                                            // setOldImageURL(null);
+                                                        }}
+                                                        className="absolute bottom-1 border-2 border-white rounded-full p-1 bg-black"
+                                                        type="button"
+                                                    >
+                                                        ❌
+                                                    </button>
                                                 )}
+                                            </div>
 
-
-                                            </label>
                                             <input
                                                 type="file"
                                                 id="profile_picture"
                                                 className="hidden"
-                                                onChange={async (event) => {
-                                                    const imageURL = await handleFileChange(event, "avatars");
-                                                    setFormData((prev) => ({ ...prev, profile_picture: imageURL }));
+                                                onChange={(event) => {
+                                                    const file = event.target.files[0];
+                                                    if (!file) return;
+
+                                                    setImageFile(file);
+                                                    setFormData((prev) => ({
+                                                        ...prev,
+                                                        profile_picture: URL.createObjectURL(file),
+                                                    }));
                                                 }}
+
                                             />
                                         </div>
 
@@ -304,8 +356,16 @@ export default function EditProfile({ onProfileUpdate }) {
                                         </div>
 
 
-                                        <Button type="submit" className="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
-                                            Save
+                                        <Button disabled={editIsLoading} type="submit" className="w-full bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded flex align-items">
+                                            {editIsLoading
+                                                ?
+                                                <>
+                                                    <p>Saving</p>
+                                                    <ButtonLoader />
+                                                </>
+                                                :
+                                                <p>Save</p>
+                                            }
                                         </Button>
                                     </form>
                                 </CardContent>

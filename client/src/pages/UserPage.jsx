@@ -202,7 +202,7 @@ export default function UserPage() {
 
                             {globalUserID === user._id &&
                                 <Settings
-                                    onClick={() => navigate('/edit_profile')}
+                                    onClick={() => navigate('/edit-profile')}
                                     className='text-white mt-1 cursor-pointer hover:rotate-90 transition scale-150'
                                 />
                             }

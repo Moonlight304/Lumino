@@ -17,7 +17,7 @@ import { userIDState } from "../configs/atoms";
 import { Link } from "react-router-dom";
 import { FaGamepad, FaDesktop, FaPlaystation, FaXbox, FaAndroid, FaApple, FaHeadset, FaMicrophone, FaKeyboard, FaFire, FaUserFriends } from 'react-icons/fa';
 import ButtonLoader from "@/helpers/ButtonLoader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { API } from "@/configs/api";
 
 
@@ -48,6 +48,7 @@ export default function UserCard({ user, setUsers }) {
             setIsLoading(false);
         }
     }
+
 
     const platformIcons = {
         PC: <FaDesktop className="mr-2 text-blue-500" />,
@@ -96,7 +97,6 @@ export default function UserCard({ user, setUsers }) {
 
                         <div className="flex items-center mt-1">
                             <TooltipProvider>
-
                                 {user.country && countryNameToCode[user.country] ? (
                                     <Tooltip>
                                         <TooltipTrigger asChild>
@@ -109,7 +109,7 @@ export default function UserCard({ user, setUsers }) {
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className='bg-white text-black'>
-                                            <p> {user.country} </p>
+                                            <p>{user.country}</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 ) : (
@@ -120,12 +120,12 @@ export default function UserCard({ user, setUsers }) {
                                             </div>
                                         </TooltipTrigger>
                                         <TooltipContent className='bg-white text-black'>
-                                            <p> Earth </p>
+                                            <p>Earth</p>
                                         </TooltipContent>
                                     </Tooltip>
                                 )}
-
                             </TooltipProvider>
+
                             <span className="text-lg text-gray-400 dark:text-gray-300">{user?.age}</span>
                         </div>
                     </div>
@@ -170,7 +170,7 @@ export default function UserCard({ user, setUsers }) {
                     </button>
                 }
             </div>
-        </div>
+        </div >
     );
 }
 

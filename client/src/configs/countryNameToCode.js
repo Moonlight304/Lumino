@@ -1,4 +1,5 @@
 export const countryNameToCode = {
+    "Don't specify": "",
     "Afghanistan": "AF",
     "Albania": "AL",
     "Algeria": "DZ",

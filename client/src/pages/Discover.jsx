@@ -11,6 +11,7 @@ import { Users } from "lucide-react"
 import Filters from "@/components/Filters"
 import Loading from "@/components/Loading"
 import { API } from "@/configs/api"
+import { countryNameToCode } from "@/configs/countryNameToCode"
 
 
 export default function Discover() {
@@ -37,7 +38,7 @@ export default function Discover() {
             const data = response.data
 
             if (data.status === "success") {
-                setUsers(data.allUsers)
+                setUsers(data.allUsers);
             }
             else {
                 toast.error(data.message, toastConfig)

@@ -66,7 +66,7 @@ export default function Auth() {
                 console.log({ display_name, email, password });
 
                 // const response = await axios.post(`${server_url}/auth/signup/`, { display_name, email, password });
-                
+
                 const response = await API('/auth/signup', 'POST', { display_name, email, password });
                 const data = response.data;
 
@@ -190,21 +190,33 @@ export default function Auth() {
                         </div>
                     }
 
-                    {isLoading
-                        ?
-                        <button
-                            className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300 flex justify-center"
-                        >
-                            <ButtonLoader />
-                        </button>
-                        :
-                        <button
-                            type="submit"
-                            className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
-                        >
-                            {isLogin ? 'Log In' : 'Sign up'}
-                        </button>
-                    }
+                    <button
+                        type="submit"
+                        className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
+                        disabled={isLoading}
+                    >
+                        {isLogin ?
+                            isLoading
+                                ?
+                                <div className='flex justify-center align-items-center'>
+                                    <p>Logging in</p>
+                                    <ButtonLoader />
+
+                                </div>
+                                :
+                                <p> Log in </p>
+                            :
+                            isLoading
+                                ?
+                                <div className='flex justify-center align-items-center'>
+                                    <p>Signing in</p>
+                                    <ButtonLoader />
+                                </div>
+                                :
+                                <p> Sign in </p>
+                        }
+                    </button>
+
                 </form>
                 <p className="mt-4 text-center text-white">
                     {

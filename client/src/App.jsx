@@ -32,14 +32,14 @@ export default function App() {
                 <Route path='/auth' element={<RedirectIfAuth><Auth /></RedirectIfAuth>} />
                 <Route path='/forgot-password' element={<RedirectIfAuth><ForgotPassword /></RedirectIfAuth>} />
                 <Route path='/reset-password' element={<RedirectIfAuth><ResetPassword /></RedirectIfAuth>} />
-                <Route path='/onboarding' element={<RedirectIfAuth><Onboarding /></RedirectIfAuth>} />
 
                 {/* Private routes */}
+                <Route path='/onboarding' element={<RequireAuth><Onboarding /></RequireAuth>} />
                 <Route path='/discover' element={<RequireAuth><Discover /></RequireAuth>} />
                 <Route path='/feed' element={<RequireAuth><Feed /></RequireAuth>} />
                 <Route path='/notifications' element={<RequireAuth><Notifications /></RequireAuth>} />
                 <Route path='/user/:display_name' element={<RequireAuth><Profile /></RequireAuth>} />
-                <Route path='/edit_profile' element={<RequireAuth><EditProfile /></RequireAuth>} />
+                <Route path='/edit-profile' element={<RequireAuth><EditProfile /></RequireAuth>} />
                 <Route path='/connections' element={<RequireAuth><Connections /></RequireAuth>} />
                 <Route path='/call/:callingUserID' element={<RequireAuth><Call /></RequireAuth>} />
             </Routes>

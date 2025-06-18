@@ -61,7 +61,8 @@ io.on('connection', (socket) => {
         if (receiverSocket && receiverSocket !== socket.id) {
             io.to(receiverSocket).emit('isTyping', {
                 isTyping,
-                senderID: senderID
+                senderID: senderID,
+                receiverID
             });
         }
     });

@@ -47,8 +47,10 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
         if (!newMessage.trim() && !cloud_image_url) return;
 
         try {
-            const response = await API(`message/new_message/${remoteUserID}`, 'POST', { newMessage, imageURL: cloud_image_url });
+            const response = await API(`/message/new_message/${remoteUserID}`, 'POST', { newMessage, imageURL: cloud_image_url });
             const data = response.data;
+
+            console.log(data)
 
             const messageObject = { senderID: globalUserID, receiverID: remoteUserID, text: newMessage, image: cloud_image_url };
             if (data.status === 'success') {
@@ -90,9 +92,9 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
             setMessages((prev) => [...prev, messageObject]);
         });
 
-        newSocket.on('isTyping', ({ isTyping, senderID }) => {
+        newSocket.on('isTyping', ({ isTyping, senderID, receiverID }) => {
             // Only update if the typing notification is from our current chat partner
-            if (senderID === remoteUserID) {
+            if (senderID === remoteUserID && receiverID === globalUserID) {
                 setRemoteUserIsTyping(isTyping ? { isTyping, senderID } : null);
             }
         });
@@ -129,7 +131,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                     receiverID: remoteUserID,
                     senderID: globalUserID
                 });
-            }, 1000);
+            }, 500);
         }
     };
 

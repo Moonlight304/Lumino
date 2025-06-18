@@ -42,6 +42,8 @@ import { ClipboardCheckIcon, ClipboardIcon, Edit, Settings, Trash } from 'lucide
 import EditPostDialog from './EditPostDialog';
 import fetchUser from '@/helpers/fetchUser';
 import { API } from '@/configs/api';
+import removeOldImage from "@/helpers/removeOldImage";
+import { Trash2 } from "lucide-react";
 
 
 const PostCard = React.memo(({ post, setPosts }) => {
@@ -54,6 +56,12 @@ const PostCard = React.memo(({ post, setPosts }) => {
     const [postUsername, setPostUsername] = useState(null);
     const [postUserAvatar, setPostUserAvatar] = useState(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
+    const [body, setBody] = useState(post.body);
+    const [imageURL, setImageURL] = useState(post.imageURL || "");
+    const [imageFile, setImageFile] = useState(null);
+    const [oldImageURL, setOldImageURL] = useState(post.imageURL || "");
+    const [isLoading, setIsLoading] = useState(false);
+    const [checkClipboard, setCheckClipboard] = useState(false);
 
     // Use useCallback for functions passed as props or event handlers
     const getLikeInclude = async () => {
@@ -128,8 +136,6 @@ const PostCard = React.memo(({ post, setPosts }) => {
         }
     };
 
-    const [checkClipboard, setCheckClipboard] = useState(false);
-
     const handleClipboard = useCallback(() => {
         if (!navigator.clipboard) {
             console.log('Clipboard API not supported');
@@ -163,6 +169,10 @@ const PostCard = React.memo(({ post, setPosts }) => {
 
     const handleDeletePost = async () => {
         try {
+            if (post?.imageURL !== "") {
+                await removeOldImage(post?.imageURL);
+            }
+
             const response = await API(`/posts/delete_post/${post?._id}/${post?.userID}`, 'GET');
             const data = response.data;
 
@@ -179,6 +189,7 @@ const PostCard = React.memo(({ post, setPosts }) => {
             toast.error('Oops.. an error occurred', toastConfig);
         }
     };
+
 
     useEffect(() => {
 
@@ -205,7 +216,7 @@ const PostCard = React.memo(({ post, setPosts }) => {
         setLikeCount(post?.likeCount);
         getSavedInclude();
         getUser();
-    }, [post?.createdAt, post?.userID, getLikeInclude, setLikeCount, getSavedInclude]);
+    }, [post?._id]);
 
 
 

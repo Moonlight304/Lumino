@@ -6,8 +6,11 @@ export async function API(route, req_type, data = null, options = {}) {
     try {
         let token = localStorage.getItem("access_token");
 
+        const isFormData = data instanceof FormData;
+
         const headers = {
             Authorization: token ? `Bearer ${token}` : "",
+            ...(isFormData ? {} : { "Content-Type": "application/json" }),
         };
 
         const response = await axios({
@@ -45,7 +48,7 @@ export async function API(route, req_type, data = null, options = {}) {
             catch (refreshError) {
                 console.error("Token refresh failed:", refreshError.response?.data || refreshError.message);
                 localStorage.removeItem("access_token");
-          
+
                 throw refreshError;
             }
         }

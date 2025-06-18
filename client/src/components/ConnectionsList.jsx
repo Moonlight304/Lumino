@@ -170,31 +170,51 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
         ));
     };
 
+    function CountBadge({ count }) {
+        if (typeof count !== 'number') return null;
+
+        return (
+            <span className="ml-2 px-2 py-[1px] rounded-md bg-neutral-800 text-neutral-300 text-xs font-semibold border border-neutral-700 shadow-sm">
+                {count}
+            </span>
+        );
+    }
+
+
     return (
         <div className="w-full md:w-1/3 h-full">
             <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
                 {/* Tab Navigation */}
-                <div className="flex justify-around bg-gray-800 p-2">
+                <div className="flex justify-around bg-gray-800 p-2 overflow-x-auto gap-2 hide-scrollbar">
                     <button
                         className={`px-4 py-2 rounded-md ${tab === 'connected' ? 'bg-primary' : 'hover:bg-gray-600'
                             }`}
                         onClick={() => setTab('connected')}
                     >
-                        Connected ({connected?.length})
+                        <span>
+                            Connected
+                            <CountBadge count={connected?.length} />
+                        </span>
                     </button>
                     <button
                         className={`px-4 py-2 rounded-md ${tab === 'received' ? 'bg-primary' : 'hover:bg-gray-600'
                             }`}
                         onClick={() => setTab('received')}
                     >
-                        Received ({received?.length})
+                        <span>
+                            Received
+                            <CountBadge count={received?.length} />
+                        </span>
                     </button>
                     <button
                         className={`px-4 py-2 rounded-md ${tab === 'sent' ? 'bg-primary' : 'hover:bg-gray-600'
                             }`}
                         onClick={() => setTab('sent')}
                     >
-                        Sent ({sent?.length})
+                        <span>
+                            Sent
+                            <CountBadge count={sent?.length} />
+                        </span>
                     </button>
                 </div>
 

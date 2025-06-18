@@ -11,29 +11,22 @@ import {
     DropdownMenuContent,
     DropdownMenuGroup,
     DropdownMenuItem,
-    DropdownMenuLabel,
-    DropdownMenuPortal,
-    DropdownMenuSeparator,
-    DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-import handleFileChange from "@/helpers/handleFileChange";
-import { toast } from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import toastConfig from "@/configs/toastConfig";
 import { Trash2 } from "lucide-react";
 import ButtonLoader from "@/helpers/ButtonLoader";
 import { API } from "@/configs/api";
-
+import removeOldImage from "@/helpers/removeOldImage";
 
 export default function NewPostCard({ setPosts, existingPost = null }) {
     const [globalDisplayName] = useRecoilState(displayNameState);
     const [globalAvatarURL] = useRecoilState(avatarURLState);
     const [body, setBody] = useState('');
     const [imageURL, setImageURL] = useState('');
+    const [imageFile, setImageFile] = useState(null);
+    const [oldImageURL, setOldImageURL] = useState('');
     const [visibility, setVisibility] = useState('everyone');
     const [isLoading, setIsLoading] = useState(false);
 
@@ -41,21 +34,37 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
         setIsLoading(true);
 
         try {
-            const response = await API(`/posts/new_post`, 'POST', { body, imageURL, visibility })
+            if (body === "") {
+                toast.error('Type something...', toastConfig);
+                return;
+            }
+
+            // If a new image is selected, upload it
+            let uploadedImageURL = imageURL;
+            if (imageFile) {
+                // Remove old image if exists
+                if (oldImageURL) {
+                    await removeOldImage(oldImageURL);
+                }
+                const form = new FormData();
+                form.append('imageFile', imageFile);
+                const imageURLResponse = await API('/images/upload?folder=posts', 'POST', form);
+                uploadedImageURL = imageURLResponse.data.secure_url;
+            }
+
+            console.log("UPloadedImageURL : " , uploadedImageURL);
+            const response = await API(`/posts/new_post`, 'POST', { body, imageURL: uploadedImageURL, visibility });
             const data = response.data;
+            console.log("Data : ", data)
 
             if (data.status === 'success' && data.newPost && data.newPost._id) {
                 toast.success('Posted', toastConfig);
-
                 setImageURL('');
+                setImageFile(null);
+                setOldImageURL('');
                 setBody('');
-
-                setPosts((prevPosts) => {
-                    const newPosts = [data.newPost, ...prevPosts];
-                    return newPosts;
-                })
-            }
-            else {
+                setPosts((prevPosts) => [data.newPost, ...prevPosts]);
+            } else {
                 toast.error(data.message, toastConfig);
                 console.log(data.message);
             }
@@ -67,6 +76,27 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
         finally {
             setIsLoading(false);
         }
+    }
+
+    async function handleImageChange(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        if (imageURL) {
+            await removeOldImage(imageURL);
+        }
+        setImageFile(file);
+        setImageURL(URL.createObjectURL(file));
+        setOldImageURL(imageURL);
+    }
+
+    async function handleRemoveImage() {
+        if (imageURL) {
+            await removeOldImage(imageURL);
+        }
+        setImageURL('');
+        setImageFile(null);
+        setOldImageURL('');
     }
 
     return (
@@ -100,17 +130,16 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
             {imageURL &&
                 <div className="relative group">
                     <img
-                        src={imageURL}
+                        src={imageFile ? URL.createObjectURL(imageFile) : imageURL}
                         alt="posted_image"
                         className="py-4 w-[97%] rounded-lg"
                     />
 
                     <span
-                        onClick={() => setImageURL('')}
-                        className="absolute right-6 top-6 hidden bg-[#000000A0] hover:bg-[#000000E0] p-2 rounded-full group-hover:block cursor-pointer"
+                        onClick={handleRemoveImage}
+                        className="absolute right-6 top-6 bg-[#000000A0] hover:bg-[#000000E0] p-2 rounded-full group-hover:block cursor-pointer"
                     > <Trash2 /> </span>
                 </div>
-
             }
 
             <div className="w-[95%] flex justify-between px-4 border-t-2 border-[#999999] pt-2">
@@ -118,17 +147,11 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                     type="file"
                     name='feed_image'
                     id='feed_image'
-                    className="hidden w-full bg-[#1A1A1A] text-white border border-gray-700 rounded px-1 py-1 focus:outline-none focus:border-primary"
-                    onChange={async (event) => {
-                        const online_url = await handleFileChange(event, 'avatars');
-                        setImageURL(online_url);
-                    }}
+                    className="hidden"
+                    onChange={handleImageChange}
                 />
                 <label htmlFor="feed_image" className="cursor-pointer">
-                    <FaImage
-                        className="w-8 h-8 hover:opacity-70"
-                    // onChange={(e) => handleFileChange(e, 'feed')}
-                    />
+                    <FaImage className="w-8 h-8 hover:opacity-70" />
                 </label>
 
                 <div className="flex gap-2">
@@ -161,7 +184,6 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>
-
 
                     {isLoading
                         ?
