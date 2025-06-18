@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 
 import { CgProfile } from 'react-icons/cg';
@@ -23,8 +22,8 @@ import { userIDState } from '../configs/atoms';
 import { socketConnection } from '../configs/socketConnection';
 import { useNavigate } from 'react-router-dom';
 import peer from '../configs/peer';
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, setRemoteUserID, messages, setMessages }) {
     const [socket, setSocket] = useState(null);
@@ -48,10 +47,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
         if (!newMessage.trim() && !cloud_image_url) return;
 
         try {
-            const response = await axios.post(`${server_url}/message/new_message/${remoteUserID}`,
-                { newMessage, imageURL: cloud_image_url },
-                { headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` } }
-            );
+            const response = await API(`message/new_message/${remoteUserID}`, 'POST', { newMessage, imageURL: cloud_image_url });
             const data = response.data;
 
             const messageObject = { senderID: globalUserID, receiverID: remoteUserID, text: newMessage, image: cloud_image_url };

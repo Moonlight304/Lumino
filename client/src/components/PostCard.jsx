@@ -1,10 +1,8 @@
-import axios from 'axios'
-import React, { useEffect, useState, useCallback } from 'react'; // Import useCallback
+import React, { useEffect, useState, useCallback } from 'react';
 import { formatDistanceToNow, parseISO } from 'date-fns';
-import { FaHeart, FaRegHeart, FaRegComment, FaShareAlt, FaRegBookmark, FaBookmark, FaClipboard } from 'react-icons/fa'
-import { CiGlobe, CiMedicalClipboard } from "react-icons/ci";
+import { FaHeart, FaRegHeart, FaRegBookmark, FaBookmark } from 'react-icons/fa'
+import { CiGlobe } from "react-icons/ci";
 import { GoPeople } from "react-icons/go";
-import { FaImage } from "react-icons/fa6";
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -40,14 +38,13 @@ import { Button } from './ui/button';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '@/configs/atoms';
 import { CgProfile } from 'react-icons/cg';
-import { Clipboard, ClipboardCheck, ClipboardCheckIcon, ClipboardIcon, Edit, Settings, Trash } from 'lucide-react';
+import { ClipboardCheckIcon, ClipboardIcon, Edit, Settings, Trash } from 'lucide-react';
 import EditPostDialog from './EditPostDialog';
-import { Input } from '@/components/ui/input';
 import fetchUser from '@/helpers/fetchUser';
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
-const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with React.memo
+const PostCard = React.memo(({ post, setPosts }) => {
     const [globalUserID] = useRecoilState(userIDState);
     const [timeAgo, setTimeAgo] = useState(null);
     const [likeCount, setLikeCount] = useState(0);
@@ -59,15 +56,9 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
     const [dropdownOpen, setDropdownOpen] = useState(false);
 
     // Use useCallback for functions passed as props or event handlers
-    const getLikeInclude = useCallback(async () => {
+    const getLikeInclude = async () => {
         try {
-            const response = await axios.get(`${server_url}/posts/${post?._id}/checkLiked`,
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                    }
-                }
-            )
+            const response = await API(`/posts/${post?._id}/checkLiked`, 'GET')
             const data = response.data;
 
             if (data.status === 'success')
@@ -81,15 +72,11 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }, [post?._id]);
+    };
 
-    const toggleLike = useCallback(async () => {
+    const toggleLike = async () => {
         try {
-            const response = await axios.get(`${server_url}/posts/${isLiked ? 'dislike' : 'like'}/${post?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/posts/${isLiked ? 'dislike' : 'like'}/${post?._id}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -104,15 +91,11 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }, [isLiked, post?._id]);
+    };
 
-    const getSavedInclude = useCallback(async () => {
+    const getSavedInclude = async () => {
         try {
-            const response = await axios.get(`${server_url}/posts/checkSaved/${post?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/posts/checkSaved/${post?._id}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success')
@@ -124,15 +107,11 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }, [post?._id]);
+    };
 
-    const toggleSavePost = useCallback(async () => {
+    const toggleSavePost = async () => {
         try {
-            const response = await axios.get(`${server_url}/posts/${isSaved ? 'deleteSavedPost' : 'savePost'}/${post?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/posts/${isSaved ? 'deleteSavedPost' : 'savePost'}/${post?._id}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -147,7 +126,7 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }, [isSaved, post?._id]);
+    };
 
     const [checkClipboard, setCheckClipboard] = useState(false);
 
@@ -182,13 +161,9 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
         }
     }, [post?._id]);
 
-    const handleDeletePost = useCallback(async () => {
+    const handleDeletePost = async () => {
         try {
-            const response = await axios.get(`${server_url}/posts/delete_post/${post?._id}/${post?.userID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/posts/delete_post/${post?._id}/${post?.userID}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -203,7 +178,7 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
         }
-    }, [post?._id, post?.userID, setPosts]);
+    };
 
     useEffect(() => {
 
@@ -321,7 +296,7 @@ const PostCard = React.memo(({ post, setPosts }) => { // Wrap PostCard with Reac
                                         ) : (
                                             <FaRegBookmark className="h-6 w-6" />
                                         )}
-                                        
+
                                         {isSaved
                                             ? 'Saved'
                                             : 'Save Post'

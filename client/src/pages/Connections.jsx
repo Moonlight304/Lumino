@@ -2,16 +2,11 @@ import { useEffect, useState } from "react";
 import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
 
-import Navbar from "../components/Navbar";
 import ConnectionsList from "../components/ConnectionsList";
 import ChatWindow from "../components/ChatWindow";
-import { useNavigate } from 'react-router-dom';
-import { useRecoilState } from 'recoil';
-import { userIDState } from '../configs/atoms';
 import { API } from '@/configs/api';
 
 export default function Connections() {
-    const [globalUserID] = useRecoilState(userIDState);
     const [remoteUserID, setRemoteUserID] = useState(null);
     const [remoteUser, setRemoteUser] = useState(null);
     
@@ -32,15 +27,6 @@ export default function Connections() {
         if (remoteUserID) handleChatWindow();
     }, [remoteUserID]);
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (!globalUserID) {
-            navigate('/');
-            toast.error('Cannot access page', toastConfig);
-        }
-
-    }, [globalUserID, navigate]);
 
     return (
         <div className="bg-background min-h-fit text-white">

@@ -17,6 +17,7 @@ import { FaDiscord, FaSteam } from 'react-icons/fa';
 import { BsFillPersonPlusFill } from 'react-icons/bs';
 import { CgProfile } from 'react-icons/cg';
 import Loading from '@/components/Loading';
+import { API } from '@/configs/api';
 
 const server_url = import.meta.env.VITE_server_url;
 
@@ -35,11 +36,7 @@ export default function UserPage() {
 
     async function handleRequest() {
         try {
-            const response = await axios.get(`${server_url}/message/send_request/${globalUserID}/${user?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            })
+            const response = await API(`/message/send_request/${globalUserID}/${user?._id}`, 'GET');
             const data = response.data;
 
             if (data.success) {
@@ -57,11 +54,7 @@ export default function UserPage() {
 
     async function handleAccept() {
         try {
-            const response = await axios.get(`${server_url}/message/accept_request/${globalUserID}/${user?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/message/accept_request/${globalUserID}/${user?._id}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -79,11 +72,7 @@ export default function UserPage() {
 
     async function handleRemoveConnection() {
         try {
-            const response = await axios.get(`${server_url}/message/remove_connection/${globalUserID}/${user?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/message/remove_connection/${globalUserID}/${user?._id}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -107,19 +96,15 @@ export default function UserPage() {
                 setUser(fetchedUser);
 
                 const userPostsData = fetchedUser.posts.length > 0
-                    ? await Promise.all(fetchedUser.posts.map(postID =>
-                        axios.get(`${server_url}/posts/${postID}`, {
-                            headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-                        }).then(res => res.data.post)
+                    ? await Promise.all(fetchedUser.posts.map(postID => 
+                        API(`/posts/${postID}`, 'GET').then(res => res.data.post)
                     ))
                     : [];
 
                 // Fetch saved posts
                 const savedPostsData = fetchedUser.savedPosts.length > 0
                     ? await Promise.all(fetchedUser.savedPosts.map(postID =>
-                        axios.get(`${server_url}/posts/${postID}`, {
-                            headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-                        }).then(res => res.data.post)
+                        API(`/posts/${postID}`, 'GET').then(res => res.data.post)
                     ))
                     : [];
 
@@ -129,11 +114,7 @@ export default function UserPage() {
                 setDisplayedPosts(userPostsData);
 
                 if (fetchedUser._id !== globalUserID) {
-                    const connectionCheckResponse = await axios.get(`${server_url}/message/check/${fetchedUser._id}`, {
-                        headers: {
-                            Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                        }
-                    });
+                    const connectionCheckResponse = await API(`/message/check/${fetchedUser._id}`, 'GET');
                     const connectionData = connectionCheckResponse.data;
                     console.log(connectionData);
 
@@ -152,12 +133,6 @@ export default function UserPage() {
         getUser();
     }, [display_name]);
 
-    useEffect(() => {
-        if (!globalUserID) {
-            navigate('/');
-            toast.error('Cannot access page');
-        }
-    }, []);
 
     if (isLoading) return <Loading message={'Getting latest user info...'} />
     if (!user) return <p className="text-white text-center">User not found.</p>;

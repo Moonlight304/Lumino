@@ -1,24 +1,14 @@
-import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useRecoilState } from "recoil"
-import axios from "axios"
 import { toast } from 'react-hot-toast'
-
-import { userIDState } from "../configs/atoms"
 import toastConfig from "../configs/toastConfig"
-import UserCard from "../components/UserCard"
-import Navbar from "../components/Navbar"
 
 import { Button } from "@/components/ui/button"
 import { DualRangeSlider } from '@/components/ui/dual-range-slider';
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger, } from "@/components/ui/drawer"
-import { Card, CardContent } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Label } from "@/components/ui/label";
-import { Filter, Loader2, Minus, Plus, Users } from "lucide-react"
-import { countryCodes } from '../configs/countryCodes';
+import { Filter } from "lucide-react"
+import { countryNameToCode } from "../configs/countryNameToCode";
 
 export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fetchUsers }) {
 
@@ -101,7 +91,7 @@ export default function Filters({ filters, setFilters, ageLimit, setAgeLimit, fe
                         <SelectValue placeholder="Select country" />
                     </SelectTrigger>
                     <SelectContent>
-                        {Object.entries(countryCodes).map(([country, code]) => (
+                        {Object.entries(countryNameToCode).map(([country, code]) => (
                             <SelectItem key={code} value={country}>
                                 {country}
                             </SelectItem>

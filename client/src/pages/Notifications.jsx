@@ -1,14 +1,12 @@
 import { useEffect, useState } from "react"
-import Navbar from "../components/Navbar"
 import { useRecoilState } from "recoil"
 import { userIDState } from "@/configs/atoms"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
 import { toast } from 'react-hot-toast'
 import toastConfig from "@/configs/toastConfig"
-import { Bell, Check, ExternalLink, Loader2, Trash2 } from "lucide-react"
+import { Bell, Check, ExternalLink, Trash2 } from "lucide-react"
 import Loading from "@/components/Loading"
 import { API } from "@/configs/api"
-
 
 export default function Notifications() {
     const [isLoading, setIsLoading] = useState(true)
@@ -43,11 +41,7 @@ export default function Notifications() {
 
     async function handleRead(notificationID) {
         try {
-            const response = await axios.get(`${server_url}/users/mark_notification/${notificationID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
-                },
-            })
+            const response = await API(`/users/mark_notification/${notificationID}`, 'GET');
             const data = response.data
 
             if (data.status === "success") {
@@ -55,10 +49,12 @@ export default function Notifications() {
                 // Update the local state to reflect the change
                 setNotifications((prev) => prev.map((n) => (n._id === notificationID ? { ...n, read: true } : n)))
                 toast.success("Marked as read", toastConfig)
-            } else {
+            }
+            else {
                 toast.error(data.message, toastConfig)
             }
-        } catch (e) {
+        }
+        catch (e) {
             toast.error("Oops.. an error occurred", toastConfig)
             console.log(e.message)
         }
@@ -66,33 +62,23 @@ export default function Notifications() {
 
     async function handleDelete(notificationID) {
         try {
-            const response = await axios.get(`${server_url}/users/delete_notification/${notificationID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}`,
-                },
-            })
+            const response = await API(`/users/delete_notification/${notificationID}`, 'GET');
             const data = response.data
 
             if (data.status === "success") {
                 console.log(data.message)
                 setNotifications((prev) => prev.filter((n) => n._id !== notificationID))
                 toast.success("Notification deleted", toastConfig)
-            } else {
+            }
+            else {
                 toast.error(data.message, toastConfig)
             }
-        } catch (e) {
+        }
+        catch (e) {
             toast.error("Oops.. an error occurred", toastConfig)
             console.log(e.message)
         }
     }
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!globalUserID) {
-            navigate('/');
-            toast.error('Cannot access page', toastConfig);
-        }
-    }, [globalUserID, navigate]);
 
     return (
         <>

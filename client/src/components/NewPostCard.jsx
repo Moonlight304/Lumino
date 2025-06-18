@@ -1,4 +1,3 @@
-import axios from "axios";
 import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { displayNameState, avatarURLState } from "@/configs/atoms";
@@ -27,8 +26,8 @@ import { toast } from 'react-hot-toast';
 import toastConfig from "@/configs/toastConfig";
 import { Trash2 } from "lucide-react";
 import ButtonLoader from "@/helpers/ButtonLoader";
+import { API } from "@/configs/api";
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function NewPostCard({ setPosts, existingPost = null }) {
     const [globalDisplayName] = useRecoilState(displayNameState);
@@ -42,14 +41,7 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
         setIsLoading(true);
 
         try {
-            const response = await axios.post(`${server_url}/posts/new_post`,
-                { body, imageURL, visibility },
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                    }
-                }
-            )
+            const response = await API(`/posts/new_post`, 'POST', { body, imageURL, visibility })
             const data = response.data;
 
             if (data.status === 'success' && data.newPost && data.newPost._id) {

@@ -13,10 +13,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useRecoilState } from 'recoil';
 import { userIDState } from '../configs/atoms';
 import { motion, AnimatePresence } from 'framer-motion';
-import toastConfig from '@/configs/toastConfig';
-import toast from 'react-hot-toast';
 
-// Memoized Background Component to reduce re-renders
 const GamingBackground = React.memo(() => {
     const GameParticles = React.useMemo(() => {
         return () => {
@@ -108,9 +105,6 @@ export default function Landing() {
     const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
     useEffect(() => {
-        if (globalUserID) {
-            navigate('/discover');
-        }
 
         // Responsive check
         const handleResize = () => {

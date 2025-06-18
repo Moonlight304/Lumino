@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { CgProfile } from 'react-icons/cg';
 import { useRecoilState } from 'recoil';
@@ -9,8 +8,8 @@ import toastConfig from '../configs/toastConfig';
 import { userIDState } from '../configs/atoms';
 import fetchUser from '../helpers/fetchUser';
 import Loading from './Loading';
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
     const [globalUserID] = useRecoilState(userIDState);
@@ -81,11 +80,7 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
 
     async function handleAccept(senderUserID) {
         try {
-            const response = await axios.get(`${server_url}/message/accept_request/${globalUserID}/${senderUserID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/message/accept_request/${globalUserID}/${senderUserID}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {
@@ -104,11 +99,7 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
 
     async function handleCancel(senderUserID, receiverUserID) {
         try {
-            const response = await axios.get(`${server_url}/message/cancel_request/${receiverUserID}/${senderUserID}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            });
+            const response = await API(`/message/cancel_request/${receiverUserID}/${senderUserID}`, 'GET');
             const data = response.data;
 
             if (data.status === 'success') {

@@ -1,20 +1,18 @@
-import toastConfig from "@/configs/toastConfig";
-import axios from "axios";
 import { useState } from "react";
+import { API } from "@/configs/api";
 import toast from "react-hot-toast";
+import toastConfig from "@/configs/toastConfig";
 import { Link } from "react-router-dom";
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
-
 
     async function handleForgotPassword(e) {
         e.preventDefault();
 
         try {
-            const response = await axios.post(`${server_url}/auth/forgot-password`, { email });
+            const response = await API('/auth/forgot-password', 'POST', { email });
             const data = response.data;
 
             if (data.status === "success") {
@@ -30,15 +28,6 @@ export default function ForgotPassword() {
             toast.error('Oops try again', toastConfig);
         }
     }
-
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (globalUserID) {
-            navigate('/');
-            toast.error('Cannot access page', toastConfig);
-        }
-
-    }, [globalUserID, navigate]);
 
     return (
         <div className="min-h-screen bg-[#0A0A0A] flex flex-col justify-center items-center p-4">

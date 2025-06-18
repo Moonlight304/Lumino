@@ -6,10 +6,7 @@ function authMiddle(req, res, next) {
         const authHeader = req.headers.authorization;
 
         if (!authHeader || authHeader === 'Bearer null')
-            return res.json({
-                status: 'fail',
-                message: 'Not authorised',
-            });
+            throw new Error('No Auth Header');
 
         const access_token = authHeader.split(' ')[1];
 
@@ -26,7 +23,8 @@ function authMiddle(req, res, next) {
         next();
     }
     catch (e) {
-        return res.json({
+        console.log(e.message)
+        return res.status(401).json({
             status: 'fail',
             message: e.message,
         })

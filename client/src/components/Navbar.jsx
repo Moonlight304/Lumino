@@ -33,7 +33,7 @@ export default function Navbar() {
             
             const response = await API('/auth/logout', 'GET');
 
-            if (response.status === 500) {
+            if (response.status === 200) {
                 localStorage.removeItem('access_token');
                 setGlobalUserID(null);
     

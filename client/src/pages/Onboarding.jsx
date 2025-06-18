@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
-import axios from "axios";
 import { toast } from 'react-hot-toast';
 import { CgProfile } from "react-icons/cg";
 
@@ -13,16 +12,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 
-import { avatarURLState, displayNameState, userIDState } from "../configs/atoms";
+import { avatarURLState, displayNameState } from "../configs/atoms";
 import toastConfig from "../configs/toastConfig";
 import handleFileChange from "../helpers/handleFileChange";
-import { countryCodes } from "@/configs/countryCodes";
+import { countryNameToCode } from "@/configs/countryNameToCode";
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function Onboarding() {
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [globalUserID] = useRecoilState(userIDState);
     const [globalDisplayName] = useRecoilState(displayNameState);
     const [globalAvatarURL, setGlobalAvatarURL] = useRecoilState(avatarURLState);
 
@@ -40,12 +37,6 @@ export default function Onboarding() {
     });
 
     const navigate = useNavigate();
-    useEffect(() => {
-        if (!globalUserID) {
-            navigate('/');
-            toast.error('Cannot access page', toastConfig);
-        }
-    }, [globalUserID]);
 
     function handleChange(e) {
         const { name, value } = e.target;
@@ -57,22 +48,23 @@ export default function Onboarding() {
         setIsSubmitting(true);
 
         try {
-            const response = await axios.post(`${server_url}/auth/onboarding`, formData, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem("jwt_token")}` },
-            });
+            const response = await API('/auth/onboarding', 'POST', formData);
             const data = response.data;
 
             if (data.status === "success") {
                 setGlobalAvatarURL(formData.profile_picture);
                 toast.success("Welcome to Lumino", toastConfig);
                 navigate("/discover");
-            } else {
+            }
+            else {
                 toast.error(data.message, toastConfig);
             }
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             toast.error("Oops.. an error occurred", toastConfig);
-        } finally {
+        }
+        finally {
             setIsSubmitting(false);
         }
     }
@@ -178,8 +170,8 @@ export default function Onboarding() {
                                         <SelectValue placeholder="Select country" />
                                     </SelectTrigger>
                                     <SelectContent>
-                                        {Object.entries(countryCodes).map(([country, code]) => (
-                                            <SelectItem key={code} value={country}>
+                                        {Object.keys(countryNameToCode).map((country) => (
+                                            <SelectItem key={countryNameToCode[country]} value={country}>
                                                 {country}
                                             </SelectItem>
                                         ))}

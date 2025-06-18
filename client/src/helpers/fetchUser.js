@@ -1,21 +1,16 @@
-import axios from "axios";
 import { toast } from 'react-hot-toast';
 import toastConfig from "../configs/toastConfig";
+import { API } from "@/configs/api";
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default async function fetchUser(userID, byName = false) {
     try {
         if (byName) {
-            const response = await axios.get(`${server_url}/users/getUserByName/${userID}`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-            });
+            const response = await API(`/users/getUserByName/${userID}`, 'GET');
             return response.data.user;
         }
         else {
-            const response = await axios.get(`${server_url}/users/getUser/${userID}`, {
-                headers: { Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}` },
-            });
+            const response = await API(`/users/getUser/${userID}`, 'GET');
             return response.data.user;
         }
     }

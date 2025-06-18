@@ -47,7 +47,7 @@ const bios = [
 
 // Expanded data arrays
 const countries = [
-    'India', 'USA', 'Germany', 'Japan', 'UK', 'Brazil', 'Canada', 'Australia',
+    'India', 'United States', 'Germany', 'Japan', 'United Kingdom', 'Brazil', 'Canada', 'Australia',
     'France', 'South Korea', 'Mexico', 'Russia', 'Italy', 'Spain', 'Netherlands',
     'Sweden', 'Norway', 'Poland', 'Turkey', 'Argentina', 'Chile', 'Thailand',
     'Philippines', 'Indonesia', 'Malaysia', 'Singapore', 'New Zealand', 'Belgium',

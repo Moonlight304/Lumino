@@ -5,7 +5,6 @@ import { FaImage } from "react-icons/fa6";
 import { CgProfile } from "react-icons/cg";
 import { toast } from 'react-hot-toast';
 import toastConfig from '../configs/toastConfig';
-import axios from 'axios';
 import { Trash2 } from "lucide-react";
 import handleFileChange from "@/helpers/handleFileChange";
 import ButtonLoader from "@/helpers/ButtonLoader";
@@ -20,8 +19,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { CiGlobe } from "react-icons/ci";
 import { GoPeople } from "react-icons/go";
+import { API } from '@/configs/api';
 
-const server_url = import.meta.env.VITE_server_url;
 
 const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
     const [globalAvatarURL] = useRecoilState(avatarURLState);
@@ -37,21 +36,9 @@ const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
         }
 
         setIsLoading(true);
-        try {
-            const response = await axios.post(
-                `${server_url}/posts/edit_post/${post?._id}`,
-                {
-                    body,
-                    imageURL,
-                    visibility,
-                },
-                {
-                    headers: {
-                        Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                    }
-                }
-            );
 
+        try {
+            const response = await API(`/posts/edit_post/${post?._id}`, 'POST', { body, imageURL, visibility, });
             const data = response.data;
 
             if (data.status === 'success') {
@@ -67,10 +54,12 @@ const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
             } else {
                 toast.error(data.message, toastConfig);
             }
-        } catch (e) {
+        }
+        catch (e) {
             console.log(e.message);
             toast.error('Failed to update post', toastConfig);
-        } finally {
+        } 
+        finally {
             setIsLoading(false);
         }
     }
@@ -80,11 +69,7 @@ const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
         setBody(post?.body || '');
         setImageURL(post?.imageURL || '');
         setVisibility(post?.visibility || 'everyone');
-        // Close dialog after state reset
         setIsOpen(false);
-
-        // location.reload();
-        
     };
 
     // Force cleanup when dialog closes

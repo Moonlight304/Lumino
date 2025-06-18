@@ -30,14 +30,6 @@ export default function Auth() {
     });
     const navigate = useNavigate();
 
-    useEffect(() => {
-        if (globalUserID) {
-            navigate('/discover');
-            toast.error('Cannot access page', toastConfig);
-        }
-
-    }, [globalUserID, navigate]);
-
 
     async function handleAuthorisation(e) {
         e.preventDefault();

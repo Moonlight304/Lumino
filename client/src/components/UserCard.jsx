@@ -1,4 +1,3 @@
-import axios from "axios";
 import { CgProfile } from "react-icons/cg";
 import { BsFillPersonPlusFill } from "react-icons/bs";
 
@@ -7,14 +6,20 @@ import toastConfig from "../configs/toastConfig";
 
 import { useRecoilState } from "recoil";
 
-import { countryCodes } from '../configs/countryCodes';
+import { countryNameToCode } from '../configs/countryNameToCode';
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { userIDState } from "../configs/atoms";
 import { Link } from "react-router-dom";
 import { FaGamepad, FaDesktop, FaPlaystation, FaXbox, FaAndroid, FaApple, FaHeadset, FaMicrophone, FaKeyboard, FaFire, FaUserFriends } from 'react-icons/fa';
 import ButtonLoader from "@/helpers/ButtonLoader";
 import { useState } from "react";
+import { API } from "@/configs/api";
 
-const server_url = import.meta.env.VITE_server_url;
 
 export default function UserCard({ user, setUsers }) {
     const [globalUserID] = useRecoilState(userIDState);
@@ -24,11 +29,7 @@ export default function UserCard({ user, setUsers }) {
         setIsLoading(true);
 
         try {
-            const response = await axios.get(`${server_url}/message/send_request/${globalUserID}/${user?._id}`, {
-                headers: {
-                    Authorization: `Bearer ${sessionStorage.getItem('jwt_token')}`
-                }
-            })
+            const response = await API(`/message/send_request/${globalUserID}/${user?._id}`, 'GET')
             const data = response.data;
 
             if (data.success) {
@@ -94,15 +95,37 @@ export default function UserCard({ user, setUsers }) {
                         </div>
 
                         <div className="flex items-center mt-1">
-                            {user.country ? (
-                                <img
-                                    src={`https://flagsapi.com/${countryCodes[user?.country]}/flat/24.png`}
-                                    alt={user?.country}
-                                    className="mr-2 flex-shrink-0"
-                                />
-                            ) : (
-                                <span className="mr-2 flex-shrink-0">🌍</span>
-                            )}
+                            <TooltipProvider>
+
+                                {user.country && countryNameToCode[user.country] ? (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="p-2 rounded-full">
+                                                <img
+                                                    src={`https://flagsapi.com/${countryNameToCode[user.country]}/flat/24.png`}
+                                                    alt={user.country}
+                                                    className="mr-2 flex-shrink-0"
+                                                />
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className='bg-white text-black'>
+                                            <p> {user.country} </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                ) : (
+                                    <Tooltip>
+                                        <TooltipTrigger asChild>
+                                            <div className="p-2 rounded-full">
+                                                <span className="mr-2 flex-shrink-0">🌍</span>
+                                            </div>
+                                        </TooltipTrigger>
+                                        <TooltipContent className='bg-white text-black'>
+                                            <p> Earth </p>
+                                        </TooltipContent>
+                                    </Tooltip>
+                                )}
+
+                            </TooltipProvider>
                             <span className="text-lg text-gray-400 dark:text-gray-300">{user?.age}</span>
                         </div>
                     </div>

@@ -1,23 +1,13 @@
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
-import { useRecoilState } from "recoil"
 import { toast } from 'react-hot-toast'
 
-import { userIDState } from "../configs/atoms"
 import toastConfig from "../configs/toastConfig"
 import UserCard from "../components/UserCard"
-import Navbar from "../components/Navbar"
 
 import { Button } from "@/components/ui/button"
-import { DualRangeSlider } from '@/components/ui/dual-range-slider';
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Drawer, DrawerClose, DrawerContent, DrawerDescription, DrawerFooter, DrawerHeader, DrawerTitle, DrawerTrigger, } from "@/components/ui/drawer"
 import { Card, CardContent } from "@/components/ui/card"
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label";
-import { Filter, Loader2, Minus, Plus, Users } from "lucide-react"
-import { countryCodes } from '../configs/countryCodes';
+import { Users } from "lucide-react"
 import Filters from "@/components/Filters"
 import Loading from "@/components/Loading"
 import { API } from "@/configs/api"
@@ -25,7 +15,6 @@ import { API } from "@/configs/api"
 
 export default function Discover() {
     const [isLoading, setIsLoading] = useState(true);
-    const [globalUserID] = useRecoilState(userIDState);
     const [users, setUsers] = useState([])
     const [ageLimit, setAgeLimit] = useState([0, 100]);
     const [filters, setFilters] = useState({
@@ -42,6 +31,7 @@ export default function Discover() {
 
     async function fetchUsers(filterParams) {
         setIsLoading(true)
+        
         try {
             const response = await API(`/users/discover?${filterParams}`, 'GET', null);
             const data = response.data
@@ -60,18 +50,11 @@ export default function Discover() {
             setIsLoading(false)
         }
     }
-    
-    const navigate = useNavigate()
 
     useEffect(() => {
-        if (!globalUserID) {
-            navigate("/");
-            toast.error('Cannot access page', toastConfig);
-        }
-
-        fetchUsers("")
-    }, [globalUserID, navigate])
-
+        fetchUsers("");
+    }, []);
+    
     return (
         <div className="min-h-fit bg-background text-white">
             <main className="w-full px-4 py-8">

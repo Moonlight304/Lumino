@@ -165,22 +165,74 @@ router.post('/login', async (req, res) => {
     }
 })
 
-router.get('/refresh', (req, res) => {
+router.get('/refresh', async (req, res) => {
+    console.log('COOKIES:')
     const token = req.cookies.refresh_token;
+    console.log('Refreshed Access Token')
 
-    if (!token) return res.status(401).json({ message: 'No token' });
+
+    if (!token) return res.status(401).json({ message: 'No token', tokenPresent: false });
 
     try {
         const payload = jwt.verify(token, REFRESH_SECRET);
+        console.log(payload);
 
-        const access_token = jwt.sign(payload, ACCESS_SECRET, { expiresIn: '15m' });
+        const existingUser = await User.findById(payload.userID);
+        const userDetails = {
+            userID: existingUser._id,
+            display_name: existingUser.display_name,
+            avatarURL: existingUser.profile_picture
+        };
 
-        res.json({ access_token });
+        let access_token;
+
+        if (userDetails?.avatarURL !== payload?.avatarURL) {
+            const refresh_token = jwt.sign(
+                userDetails,
+                REFRESH_SECRET,
+                {
+                    expiresIn: '7d'
+                }
+            );
+
+            res.cookie('refresh_token', refresh_token, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+                path: '/',
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+            });
+
+            access_token = jwt.sign(userDetails, ACCESS_SECRET, { expiresIn: '15m' });
+        }
+        else {
+            delete payload?.iat;
+            delete payload?.exp;
+
+            access_token = jwt.sign(payload, ACCESS_SECRET, { expiresIn: '15m' });
+        }
+
+
+        return res.status(200).json({ access_token, tokenPresent: true });
     }
     catch (err) {
-        res.status(403).json({ message: 'Invalid token' });
+        console.log(err.message)
+        return res.status(403).json({ message: 'Invalid token', tokenPresent: false });
     }
 })
+
+router.get('/check-refresh', (req, res) => {
+    const token = req.cookies.refresh_token;
+
+    try {
+        return res.status(200).json({ tokenPresent: token ? true : false });
+    }
+    catch (err) {
+        console.log(err.message)
+        return res.status(403).json({ message: 'Invalid token', tokenPresent: false });
+    }
+})
+
 
 router.get('/logout', (req, res) => {
     try {
