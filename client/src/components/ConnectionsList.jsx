@@ -9,6 +9,7 @@ import { userIDState } from '../configs/atoms';
 import fetchUser from '../helpers/fetchUser';
 import Loading from './Loading';
 import { API } from '@/configs/api';
+import { useNavigate } from 'react-router-dom';
 
 
 export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
@@ -18,6 +19,7 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
     const [connected, setConnected] = useState([]);
     const [received, setReceived] = useState([]);
     const [sent, setSent] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchTabUsers();
@@ -131,6 +133,8 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
                 onClick={() => {
                     if (tab === 'connected')
                         return handleUserSelect(user)
+                    else
+                        navigate(`/user/${user?.display_name}`)
                 }}
             >
                 <div className="flex items-center">
@@ -157,7 +161,9 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
 
                         <button
                             className='bg-red-600 p-2 rounded-lg'
-                            onClick={() => {
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                
                                 if (tab === 'received')
                                     return handleCancel(user?._id, globalUserID);
                                 else
@@ -185,7 +191,7 @@ export default function ConnectionsList({ setRemoteUser, setRemoteUserID }) {
         <div className="w-full md:w-1/3 h-full">
             <div className="bg-gray-900 rounded-lg shadow-lg overflow-hidden h-full flex flex-col">
                 {/* Tab Navigation */}
-                <div className="flex justify-around bg-gray-800 p-2 overflow-x-auto gap-2 hide-scrollbar">
+                <div className="flex justify-around bg-gray-900 p-2 overflow-x-auto gap-2 hide-scrollbar">
                     <button
                         className={`px-4 py-2 rounded-md ${tab === 'connected' ? 'bg-primary' : 'hover:bg-gray-600'
                             }`}

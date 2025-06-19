@@ -77,7 +77,7 @@ export default function Discover() {
                         </DrawerContent>
                     </Drawer>
 
-                    <Card className="max-md:hidden w-full md:w-80 h-fit sticky top-20 bg-gray-900 border-red-600">
+                    <Card className="max-md:hidden w-full md:w-80 h-fit sticky top-20 bg-gray-900 border-transparent">
                         <CardContent className="p-6">
                             <Filters
                                 filters={filters}

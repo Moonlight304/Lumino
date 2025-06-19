@@ -145,52 +145,48 @@ export default function Landing() {
 
             {/* Header */}
             <motion.header
-                initial={{ opacity: 0, y: -50 }}
+                initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
-                className="container mx-auto px-4 py-4 flex justify-between items-center relative z-10"
+                transition={{ duration: 0.4 }}
+                className="container mx-auto px-4 py-6 flex justify-between items-center relative z-10"
             >
-                <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    className="text-3xl md:text-5xl font-black text-red-500"
-                >
+                <motion.div className="text-3xl md:text-4xl font-bold text-white">
                     LUMINO
                 </motion.div>
-                <nav className={`${isMobile ? 'hidden' : 'flex'} space-x-4 md:space-x-6 items-center`}>
+                {/* <nav className={`${isMobile ? 'hidden' : 'flex'} space-x-6 items-center`}>
                     <NavItem to={'/'}>Home</NavItem>
                     <NavItem to={'/feed'}>Community</NavItem>
-                    <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+                    <motion.div whileHover={{ scale: 1.05 }}>
                         <Link to={'/auth'}>
-                            <button className="px-4 md:px-8 py-2 md:py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition transform shadow-lg text-sm md:text-base">
-                                Join the Battle
+                            <button className="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                                Sign In
                             </button>
                         </Link>
                     </motion.div>
-                </nav>
+                </nav> */}
             </motion.header>
 
             {/* Hero Section */}
-            <section className="container mx-auto px-4 py-12 md:py-16 grid md:grid-cols-2 gap-8 md:gap-10 items-center relative z-10">
+            <section className="container mx-auto mt-16 px-4 py-12 md:py-16 grid md:grid-cols-2 gap-8 md:gap-10 items-center relative z-10">
                 <motion.div
-                    initial={{ x: -100, opacity: 0 }}
-                    animate={{ x: 0, opacity: 1 }}
-                    transition={{ duration: 0.8 }}
-                    className="space-y-4 md:space-y-6 text-center md:text-left"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6 }}
+                    className="space-y-6 text-center md:text-left"
                 >
-                    <h1 className="text-4xl md:text-7xl font-black text-red-500 animate-pulse leading-tight">
-                        Unleash Your Gaming Potential
+                    <h1 className="text-4xl md:text-6xl font-bold leading-tight">
+                        Elevate Your
+                        <span className="text-red-500"> Gaming </span>
+                        Experience
                     </h1>
-                    <p className="text-lg md:text-2xl text-gray-300 opacity-80 tracking-wide">
-                        More than a platform. A digital battleground where legends are forged, skills are sharpened, and gaming dreams become epic reality.
+                    <p className="text-lg text-gray-300 leading-relaxed">
+                        Join a competitive gaming platform designed for passionate players.
+                        Connect, compete, and grow in a community that takes gaming seriously.
                     </p>
-                    <motion.div
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.95 }}
-                        className="flex justify-center md:justify-start"
-                    >
+                    <motion.div whileHover={{ scale: 1.02 }} className="inline-flex justify-center md:justify-start">
                         <Link to={'/auth'}>
-                            <button className="px-8 md:px-12 py-3 md:py-5 bg-red-600 text-white rounded-lg hover:bg-red-700 transition transform shadow-2xl flex items-center gap-3">
-                                <FaGamepad className='w-10 h-10' /> Start Your Epic Journey
+                            <button className="px-8 py-3 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors flex items-center gap-2">
+                                <FaGamepad className="w-5 h-5" /> Get Started
                             </button>
                         </Link>
                     </motion.div>
@@ -201,7 +197,7 @@ export default function Landing() {
                     variants={containerVariants}
                     initial="hidden"
                     animate="visible"
-                    className="grid grid-cols-2 gap-4 md:gap-6"
+                    className="grid grid-cols-2 gap-4 md:gap-6 scale-105 md:scale-90"
                 >
                     <AnimatePresence>
                         <FeatureCard
@@ -233,7 +229,7 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <motion.footer
+            {/* <motion.footer
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1 }}
@@ -249,7 +245,7 @@ export default function Landing() {
                         &copy; {new Date().getFullYear()} Lumino - Where Legends Clash
                     </p>
                 </div>
-            </motion.footer>
+            </motion.footer> */}
         </div>
     );
 }

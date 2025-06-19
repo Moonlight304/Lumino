@@ -192,28 +192,35 @@ export default function Auth() {
 
                     <button
                         type="submit"
-                        className="w-full bg-primary text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
+                        className="w-full bg-primary disabled:bg-primary-disabled text-white py-2 rounded font-semibold hover:bg-opacity-90 transition duration-300"
                         disabled={isLoading}
                     >
                         {isLogin ?
-                            isLoading
-                                ?
-                                <div className='flex justify-center align-items-center'>
-                                    <p>Logging in</p>
-                                    <ButtonLoader />
-
-                                </div>
-                                :
-                                <p> Log in </p>
+                            <div className='flex justify-center align-items-center gap-4'>
+                                {
+                                    isLoading
+                                        ?
+                                        <>
+                                            <p>Logging in</p>
+                                            <ButtonLoader className="w-5" />
+                                        </>
+                                        :
+                                        <p> Log in </p>
+                                }
+                            </div>
                             :
-                            isLoading
-                                ?
-                                <div className='flex justify-center align-items-center'>
-                                    <p>Signing in</p>
-                                    <ButtonLoader />
-                                </div>
-                                :
-                                <p> Sign in </p>
+                            <div className='flex justify-center align-items-center gap-4'>
+                                {
+                                    isLoading
+                                        ?
+                                        <>
+                                            <p>Signing in</p>
+                                            <ButtonLoader className="w-5" />
+                                        </>
+                                        :
+                                        <p> Sign in </p>
+                                }
+                            </div>
                         }
                     </button>
 

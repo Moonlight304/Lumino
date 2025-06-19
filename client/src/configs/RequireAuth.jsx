@@ -10,5 +10,5 @@ export default function RequireAuth({ children }) {
     }, []);
 
     if (auth === null) return null;
-    return auth ? children : <Navigate to="/" />;
+    return auth ? children : <Navigate to="/auth" />;
 }

@@ -43,7 +43,6 @@ import EditPostDialog from './EditPostDialog';
 import fetchUser from '@/helpers/fetchUser';
 import { API } from '@/configs/api';
 import removeOldImage from "@/helpers/removeOldImage";
-import { Trash2 } from "lucide-react";
 
 
 const PostCard = React.memo(({ post, setPosts }) => {
@@ -55,12 +54,9 @@ const PostCard = React.memo(({ post, setPosts }) => {
     const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
     const [postUsername, setPostUsername] = useState(null);
     const [postUserAvatar, setPostUserAvatar] = useState(null);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
-    const [body, setBody] = useState(post.body);
-    const [imageURL, setImageURL] = useState(post.imageURL || "");
-    const [imageFile, setImageFile] = useState(null);
-    const [oldImageURL, setOldImageURL] = useState(post.imageURL || "");
-    const [isLoading, setIsLoading] = useState(false);
+    const [saveLoading, setSaveLoading] = useState(false);
+    const [likeLoading, setLikeLoading] = useState(false);
+    const [deleteLoading, setDeleteLoading] = useState(false);
     const [checkClipboard, setCheckClipboard] = useState(false);
 
     // Use useCallback for functions passed as props or event handlers
@@ -83,6 +79,8 @@ const PostCard = React.memo(({ post, setPosts }) => {
     };
 
     const toggleLike = async () => {
+        setLikeLoading(true);
+
         try {
             const response = await API(`/posts/${isLiked ? 'dislike' : 'like'}/${post?._id}`, 'GET');
             const data = response.data;
@@ -98,6 +96,9 @@ const PostCard = React.memo(({ post, setPosts }) => {
         catch (e) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
+        }
+        finally {
+            setLikeLoading(false);
         }
     };
 
@@ -118,6 +119,8 @@ const PostCard = React.memo(({ post, setPosts }) => {
     };
 
     const toggleSavePost = async () => {
+        setSaveLoading(true);
+
         try {
             const response = await API(`/posts/${isSaved ? 'deleteSavedPost' : 'savePost'}/${post?._id}`, 'GET');
             const data = response.data;
@@ -133,6 +136,9 @@ const PostCard = React.memo(({ post, setPosts }) => {
         catch (e) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
+        }
+        finally {
+            setSaveLoading(false);
         }
     };
 
@@ -168,6 +174,8 @@ const PostCard = React.memo(({ post, setPosts }) => {
     }, [post?._id]);
 
     const handleDeletePost = async () => {
+        setDeleteLoading(true);
+
         try {
             if (post?.imageURL !== "") {
                 await removeOldImage(post?.imageURL);
@@ -187,6 +195,9 @@ const PostCard = React.memo(({ post, setPosts }) => {
         catch (e) {
             console.log(e.message);
             toast.error('Oops.. an error occurred', toastConfig);
+        }
+        finally {
+            setDeleteLoading(false);
         }
     };
 
@@ -221,7 +232,7 @@ const PostCard = React.memo(({ post, setPosts }) => {
 
 
     return (
-        <div className="flex flex-col justify-center items-center w-[95%] sm:w-2/3 md:w-3/4 max-w-2xl m-5 mt-5 bg-fourth rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col justify-center items-center w-[95%] sm:w-3/4 md:w-full max-w-3xl m-5 mt-5 bg-gray-900 rounded-lg shadow-lg overflow-hidden">
             <div className="p-4 border-b-[#999999] border-b-2 w-[95%]">
                 <div className="flex items-center space-x-8 relative">
                     <div className="flex items-center space-x-2 relative">
@@ -294,14 +305,14 @@ const PostCard = React.memo(({ post, setPosts }) => {
                                                 <Edit className="mr-2 h-4 w-4" />
                                                 Edit
                                             </DropdownMenuItem>
-                                            <DropdownMenuItem onClick={handleDeletePost}>
+                                            <DropdownMenuItem disabled={deleteLoading} onClick={handleDeletePost}>
                                                 <Trash />
                                                 Delete
                                             </DropdownMenuItem>
                                         </>
                                     )}
 
-                                    <DropdownMenuItem onClick={toggleSavePost}>
+                                    <DropdownMenuItem disabled={saveLoading} onClick={toggleSavePost}>
                                         {isSaved ? (
                                             <FaBookmark className="h-6 w-6 text-[#FF3333]" />
                                         ) : (
@@ -359,6 +370,7 @@ const PostCard = React.memo(({ post, setPosts }) => {
                     <button
                         className='flex items-center space-x-1 text-[#BDBDBD]'
                         onClick={toggleLike}
+                        disabled={likeLoading}
                     >
                         {isLiked ? (
                             <FaHeart className="h-6 w-6 text-[#FF3333]" />

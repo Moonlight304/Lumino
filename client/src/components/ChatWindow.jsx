@@ -224,11 +224,11 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
 
                             {remoteUserIsTyping && remoteUserIsTyping.senderID === remoteUserID && (
                                 <div className='chat chat-start chat-bubble'>
-                                    <div className="flex items-center gap-1 p-3 rounded-lg bg-gray-800 text-gray-500 text-sm w-fit">
+                                    <div className="flex items-center gap-1 p-3 rounded-lg bg-gray-900 text-gray-500 text-sm w-fit">
                                         <div className="flex gap-0.5">
-                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0s]"></span>
-                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0.2s]"></span>
-                                            <span className="w-1.5 h-1.5 bg-gray-500 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-900 rounded-full animate-bounce [animation-delay:0s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-900 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                            <span className="w-1.5 h-1.5 bg-gray-900 rounded-full animate-bounce [animation-delay:0.4s]"></span>
                                         </div>
                                     </div>
                                 </div>
@@ -262,7 +262,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => handleTyping(e.target.value)}
-                                    className="flex-grow bg-gray-800 text-white rounded-l-lg p-2 focus:outline-none"
+                                    className="flex-grow bg-gray-900 text-white rounded-l-lg p-2 focus:outline-none"
                                     onKeyDown={async (e) => {
                                         if (e.key === "Enter") {
                                             e.preventDefault();

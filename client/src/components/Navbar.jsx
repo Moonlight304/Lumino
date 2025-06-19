@@ -30,13 +30,13 @@ export default function Navbar() {
 
     async function handleLogout() {
         try {
-            
+
             const response = await API('/auth/logout', 'GET');
 
             if (response.status === 200) {
                 localStorage.removeItem('access_token');
                 setGlobalUserID(null);
-    
+
                 navigate('/');
                 toast.success('Logged out', toastConfig)
             }
@@ -56,10 +56,18 @@ export default function Navbar() {
 
             <div className="flex gap-4 max-lg:hidden">
                 <nav className="flex justify-center items-center gap-5">
-                    <Link to={'/discover'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Compass /> Discover </Link>
-                    <Link to={'/feed'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Newspaper /> Feed </Link>
-                    <Link to={'/connections'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Gamepad /> Connections </Link>
-                    <Link to={'/notifications'} className="p-2 rounded-lg hover:bg-primary transition duration-300 flex gap-4"> <Bell /> Notifications </Link>
+                    <Link to={'/discover'} className="p-2 rounded-lg hover:bg-primary group transition duration-300 flex gap-4"> <Compass className="transition-transform duration-500 group-hover:rotate-[180deg]" /> Discover </Link>
+                    <Link to="/feed" className="p-2 rounded-lg hover:bg-primary group transition duration-300 flex gap-4">
+                        <Newspaper className="transition-transform duration-300 group-hover:-translate-y-1" />
+                        Feed
+                    </Link>
+
+                    <Link to="/connections" className="p-2 rounded-lg hover:bg-primary group transition duration-300 flex gap-4">
+                        <Gamepad className="transition-transform duration-300 group-hover:-rotate-[20deg]" />
+                        Connections
+                    </Link>
+
+                    <Link to={'/notifications'} className="p-2 rounded-lg group hover:bg-primary transition duration-300 flex gap-4"> <Bell className="transition-transform duration-100 group-hover:animate-wiggle" /> Notifications </Link>
 
                     <Button
                         onClick={() => handleLogout()}

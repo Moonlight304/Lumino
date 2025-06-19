@@ -11,62 +11,101 @@ router.get('/discover', authMiddleware, async (req, res) => {
     try {
         const {
             country,
-            ageLower,
-            ageUpper,
             gender,
-            favourite_games,
-            favourite_genres,
             platform,
             playstyle,
             communication_preference,
+            ageLower,
+            ageUpper,
+            favourite_games,
+            favourite_genres,
         } = req.query;
 
-        console.log(req.query);
-
-
         const user = await User.findById(userID);
-        if (!user)
+        if (!user) {
             return res.json({
                 status: 'fail',
                 message: 'User not found'
-            })
+            });
+        }
 
-        let filterQuery = {
-            _id: {
-                $nin: [userID, ...user.sentIDs, ...user.connectedIDs, ...user.receivedIDs],
-            },
+        const filterQuery = {
+            _id: { $nin: [userID, ...user.sentIDs, ...user.connectedIDs, ...user.receivedIDs] }
         };
 
+        const andConditions = [];
 
-        // Add filters dynamically
-        if (country) filterQuery.country = country;
-        if (gender) filterQuery.gender = gender;
-        if (platform) filterQuery.platform = platform;
-        if (playstyle) filterQuery.playstyle = playstyle;
-        if (communication_preference) filterQuery.communication_preference = communication_preference;
-
-        let ageL = Number(ageLower) || 0;
-        let ageU = Number(ageUpper) || 100;
-
-
-        if (!isNaN(ageL) || !isNaN(ageU)) {
-            filterQuery.age = {};
-            if (!isNaN(ageL)) filterQuery.age.$gte = ageL;
-            if (!isNaN(ageU)) filterQuery.age.$lte = ageU;
+        // Direct equality filters
+        if (country) andConditions.push({ country });
+        if (gender) {
+            andConditions.push({
+                $or: [
+                    { gender: gender },
+                    // { gender: 'dont-specify' }
+                ]
+            })
         }
 
+        if (communication_preference) andConditions.push({ communication_preference });
+
+        // Platform filter: exact or 'Any'
+        if (platform) {
+            andConditions.push({
+                $or: [
+                    { platform: platform },
+                    { platform: 'Any' }
+                ]
+            });
+        }
+
+        // Playstyle filter: exact or 'Any'
+        if (playstyle) {
+            andConditions.push({
+                $or: [
+                    { playstyle: playstyle },
+                    { playstyle: 'Any' }
+                ]
+            });
+        }
+
+        // Age filter
+        const ageLowerRaw = req.query.ageLower?.trim();
+        const ageUpperRaw = req.query.ageUpper?.trim();
+
+        const ageL = Number(ageLowerRaw);
+        const ageU = Number(ageUpperRaw);
+
+        if (!isNaN(ageL) && !isNaN(ageU) && ageL != ageU) {
+            const ageQuery = {};
+            if (!isNaN(ageL)) ageQuery.$gte = ageL;
+            if (!isNaN(ageU)) ageQuery.$lte = ageU;
+            andConditions.push({ age: ageQuery });
+        }
+
+
+
+        // Favourite games filter (match at least one)
         if (favourite_games) {
-            const gamesArray = favourite_games.split(',');
-            console.log(gamesArray);
-            filterQuery.favourite_games = { $in: gamesArray };
+            const gamesArray = favourite_games.split(',').map(g => g.trim()).filter(Boolean);
+            if (gamesArray.length > 0) {
+                andConditions.push({ favourite_games: { $in: gamesArray } });
+            }
         }
+
+        // Favourite genres filter (match at least one)
         if (favourite_genres) {
-            const genresArray = favourite_genres.split(',');
-            filterQuery.favourite_genres = { $in: genresArray };
+            const genresArray = favourite_genres.split(',').map(g => g.trim()).filter(Boolean);
+            if (genresArray.length > 0) {
+                andConditions.push({ favourite_genres: { $in: genresArray } });
+            }
         }
 
-        console.log(filterQuery);
+        // Combine everything into one query
+        if (andConditions.length > 0) {
+            filterQuery.$and = andConditions;
+        }
 
+        console.log(JSON.stringify(filterQuery, null, 2));
 
         const allUsers = await User.find(filterQuery);
 
@@ -74,14 +113,15 @@ router.get('/discover', authMiddleware, async (req, res) => {
             status: 'success',
             allUsers,
         });
-    }
-    catch (e) {
+
+    } catch (e) {
         return res.json({
             status: 'fail',
             message: e.message,
         });
     }
 });
+
 
 router.get('/me', authMiddleware, async (req, res) => {
     const { userID } = req.user;

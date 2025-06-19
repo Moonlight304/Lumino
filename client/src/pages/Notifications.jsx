@@ -95,8 +95,7 @@ export default function Notifications() {
                         {notifications.map((notification, index) => (
                             <div
                                 key={index}
-                                className={`rounded-lg border p-4 shadow-sm transition-all ${notification?.read ? "bg-background" : "bg-primary/5 border-primary/20"
-                                    }`}
+                                className={`rounded-lg border p-4 shadow-sm transition-all border-transparent bg-[#212121] `}
                             >
                                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <div className="flex-1">

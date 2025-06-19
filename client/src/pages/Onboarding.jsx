@@ -170,20 +170,20 @@ export default function Onboarding() {
                         {/* Bio */}
                         <div>
                             <Label htmlFor="bio" className="text-white">Bio</Label>
-                            <Textarea id="bio" name="bio" placeholder="Tell us about yourself..." value={formData.bio} onChange={handleChange} className="bg-gray-800 border-red-500 text-white" />
+                            <Textarea id="bio" name="bio" placeholder="Tell us about yourself..." value={formData.bio} onChange={handleChange} className="bg-gray-900 border-red-500 text-white" />
                         </div>
 
                         {/* Age & Gender */}
                         <div className="grid grid-cols-2 gap-4 max-md:grid-cols-1">
                             <div>
                                 <Label htmlFor="age" className="text-white">Age</Label>
-                                <Input type="number" id="age" name="age" placeholder="Enter your age" value={formData.age} onChange={handleChange} className="bg-gray-800 border-red-500 text-white" />
+                                <Input type="number" id="age" name="age" placeholder="Enter your age" value={formData.age} onChange={handleChange} className="bg-gray-900 border-red-500 text-white" />
                             </div>
 
                             <div>
                                 <Label htmlFor="gender" className="text-white">Gender</Label>
                                 <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, gender: value }))} value={formData.gender} >
-                                    <SelectTrigger className='bg-gray-800 text-white border-red-500'>
+                                    <SelectTrigger className='bg-gray-900 text-white border-red-500'>
                                         <SelectValue placeholder="Select gender" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -201,7 +201,7 @@ export default function Onboarding() {
                             <div>
                                 <Label htmlFor="country" className="text-white">Country</Label>
                                 <Select value={formData.country} onValueChange={(value) => setFormData((prev) => ({ ...prev, country: value }))} >
-                                    <SelectTrigger className='bg-gray-800 text-white border-red-500'>
+                                    <SelectTrigger className='bg-gray-900 text-white border-red-500'>
                                         <SelectValue placeholder="Select country" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -220,7 +220,7 @@ export default function Onboarding() {
                                     value={formData.communication_preference}
                                     onValueChange={(value) => setFormData((prev) => ({ ...prev, communication_preference: value }))}
                                 >
-                                    <SelectTrigger className='bg-gray-800 text-white border-red-500'>
+                                    <SelectTrigger className='bg-gray-900 text-white border-red-500'>
                                         <SelectValue placeholder="Select preference" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -238,7 +238,7 @@ export default function Onboarding() {
                             <div>
                                 <Label htmlFor="platform" className="text-white">Platform</Label>
                                 <Select value={formData.platform} onValueChange={(value) => setFormData((prev) => ({ ...prev, platform: value }))}>
-                                    <SelectTrigger className='bg-gray-800 text-white border-red-500'>
+                                    <SelectTrigger className='bg-gray-900 text-white border-red-500'>
                                         <SelectValue placeholder="Select platform" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -255,7 +255,7 @@ export default function Onboarding() {
                             <div>
                                 <Label htmlFor="playstyle" className="text-white">Playstyle</Label>
                                 <Select value={formData.playstyle} onValueChange={(value) => setFormData((prev) => ({ ...prev, playstyle: value }))}>
-                                    <SelectTrigger className='bg-gray-800 text-white border-red-500'>
+                                    <SelectTrigger className='bg-gray-900 text-white border-red-500'>
                                         <SelectValue placeholder="Select playstyle" />
                                     </SelectTrigger>
                                     <SelectContent>
@@ -277,7 +277,7 @@ export default function Onboarding() {
                                 value={formData.favourite_games}
                                 onChange={handleChange}
                                 placeholder="Comma separated games"
-                                className='bg-gray-800 text-white border-red-500'
+                                className='bg-gray-900 text-white border-red-500'
                             />
                         </div>
 
@@ -289,7 +289,7 @@ export default function Onboarding() {
                                 value={formData.favourite_genres}
                                 onChange={handleChange}
                                 placeholder="Comma separated genres"
-                                className='bg-gray-800 text-white border-red-500'
+                                className='bg-gray-900 text-white border-red-500'
                             />
                         </div>
 

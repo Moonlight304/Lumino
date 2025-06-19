@@ -122,7 +122,7 @@ const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
 
     return (
         <Dialog open={isOpen} onOpenChange={setIsOpen} >
-            <DialogContent className="bg-fourth text-white overflow-y-auto max-h-[90vh] max-w-[90vw] sm:max-w-[40vw]">
+            <DialogContent className="bg-gray-900 text-white overflow-y-auto max-h-[90vh] max-w-[90vw] sm:max-w-[40vw]">
                 <DialogHeader>
                     <DialogTitle>Edit Post</DialogTitle>
                 </DialogHeader>
@@ -217,7 +217,7 @@ const EditPostDialog = React.memo(({ post, isOpen, setIsOpen, setPosts }) => {
                             <Button
                                 variant="ghost"
                                 onClick={handleClose}
-                                className="text-white hover:bg-gray-800"
+                                className="text-white hover:bg-gray-900"
                             >
                                 Cancel
                             </Button>

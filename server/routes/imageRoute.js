@@ -18,6 +18,25 @@ router.post('/upload', upload.single('imageFile'), authMiddleware, async (req, r
     const { userID } = req.user;
     const folder = req.query.folder || 'avatars';
 
+    let height, width;
+
+    if (folder === 'avatars') {
+        height = 500;
+        width = 500;
+    }
+    else if (folder === 'posts') {
+        height = 1080;
+        width = 1920;
+    }
+    else if (folder === 'chats') {
+        height = 1080;
+        width = 1920;
+    }
+
+    const transformation = [
+        { height, width },
+    ]
+
     try {
         const fileBuffer = req.file.buffer;
 
@@ -26,6 +45,7 @@ router.post('/upload', upload.single('imageFile'), authMiddleware, async (req, r
             {
                 folder,
                 resource_type: 'image',
+                transformation
             },
             (error, result) => {
                 if (error) return res.status(500).json({ error: error.message });

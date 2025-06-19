@@ -29,6 +29,7 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
     const [oldImageURL, setOldImageURL] = useState('');
     const [visibility, setVisibility] = useState('everyone');
     const [isLoading, setIsLoading] = useState(false);
+    const [imageLoading, setImageLoading] = useState(false);
 
     async function handleNewPost() {
         setIsLoading(true);
@@ -100,7 +101,7 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
     }
 
     return (
-        <div className="flex flex-col justify-center items-center p-2 w-[95%] sm:w-2/3 md:w-3/4 max-w-2xl m-5 mt-5 bg-fourth rounded-lg shadow-lg overflow-hidden">
+        <div className="flex flex-col justify-center items-center p-2 w-[95%] sm:w-3/4 md:w-full max-w-3xl m-5 mt-5 bg-gray-900 rounded-lg shadow-lg overflow-hidden">
             <div className="flex mb-2">
                 {globalAvatarURL !== ''
                     ?
@@ -196,6 +197,7 @@ export default function NewPostCard({ setPosts, existingPost = null }) {
                         <Button
                             onClick={handleNewPost}
                             className="bg-black border-2 border-red-800 text-red-500 hover:bg-red-600 hover:text-white"
+                            disabled={isLoading}
                         >
                             Post
                         </Button>

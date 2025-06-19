@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/tooltip"
 import { userIDState } from "../configs/atoms";
 import { Link } from "react-router-dom";
-import { FaGamepad, FaDesktop, FaPlaystation, FaXbox, FaAndroid, FaApple, FaHeadset, FaMicrophone, FaKeyboard, FaFire, FaUserFriends } from 'react-icons/fa';
+import { FaGamepad, FaDesktop, FaPlaystation, FaXbox, FaAndroid, FaApple, FaHeadset, FaMicrophone, FaKeyboard, FaFire, FaUserFriends, FaLaptop, FaLayerGroup, FaBalanceScale, FaRandom, FaCommentDots, FaRegKeyboard, FaComments, FaWaveSquare, FaSatelliteDish } from 'react-icons/fa';
 import ButtonLoader from "@/helpers/ButtonLoader";
 import { useState, useEffect } from "react";
 import { API } from "@/configs/api";
@@ -50,31 +50,90 @@ export default function UserCard({ user, setUsers }) {
     }
 
 
+    const iconSize = 18;
+    const commonClass = "mr-2 shrink-0";
+
     const platformIcons = {
-        PC: <FaDesktop className="mr-2 text-blue-500" />,
-        PlayStation: <FaPlaystation className="mr-2 text-blue-600" />,
-        Xbox: <FaXbox className="mr-2 text-green-500" />,
-        Android: <FaAndroid className="mr-2 text-green-400" />,
-        IOS: <FaApple className="mr-2 text-gray-400" />,
-        Any: <FaGamepad className="mr-2 text-gray-500" />,
+        PC: <FaDesktop size={iconSize} className={`${commonClass} text-blue-500`} title="PC" />,
+        PlayStation: <FaPlaystation size={iconSize} className={`${commonClass} text-indigo-500`} title="PlayStation" />,
+        Xbox: <FaXbox size={iconSize} className={`${commonClass} text-green-500`} title="Xbox" />,
+        Android: <FaAndroid size={iconSize} className={`${commonClass} text-green-400`} title="Android" />,
+        IOS: <FaApple size={iconSize} className={`${commonClass} text-gray-400`} title="iOS" />,
+        Any: (
+            <div className={`${commonClass} relative w-6 h-6`} title="Any Platform">
+                <FaLaptop size={20} className="absolute top-0 left-0 text-blue-500" />
+                <FaGamepad size={18} className="absolute bottom-0 right-0 text-purple-500" />
+            </div>
+        ),
     };
 
     const playstyleIcons = {
-        Casual: <FaUserFriends className="mr-2 text-yellow-400" />,
-        Competitive: <FaFire className="mr-2 text-red-500" />,
-        Mixed: <FaGamepad className="mr-2 text-purple-500" />,
-        Any: <FaGamepad className="mr-2 text-gray-500" />,
+        Casual: (
+            <FaUserFriends
+                size={iconSize}
+                className={`${commonClass} text-yellow-400`}
+                title="Casual"
+            />
+        ),
+        Competitive: (
+            <FaFire
+                size={iconSize}
+                className={`${commonClass} text-red-500`}
+                title="Competitive"
+            />
+        ),
+        Mixed: (
+            <FaBalanceScale
+                size={iconSize}
+                className={`${commonClass} text-purple-500`}
+                title="Mixed Playstyle"
+            />
+        ),
+        Any: (
+            <FaRandom
+                size={iconSize}
+                className={`${commonClass} text-lime-300`}
+                title="Any Playstyle"
+            />
+        ),
     };
+
 
     const communicationIcons = {
-        Voice: <FaMicrophone className="mr-2 text-blue-500" />,
-        Text: <FaKeyboard className="mr-2 text-green-500" />,
-        Both: <FaHeadset className="mr-2 text-purple-500" />,
-        Any: <FaHeadset className="mr-2 text-gray-500" />,
+        Voice: (
+            <FaMicrophone
+                size={iconSize}
+                className={`${commonClass} text-blue-500`}
+                title="Voice Chat"
+            />
+        ),
+        Text: (
+            <FaRegKeyboard
+                size={iconSize}
+                className={`${commonClass} text-green-500`}
+                title="Text Chat"
+            />
+        ),
+        Both: (
+            <FaWaveSquare
+                size={iconSize}
+                className={`${commonClass} text-indigo-500`}
+                title="Voice & Text"
+            />
+        ),
+        Any: (
+            <FaSatelliteDish
+                size={iconSize}
+                className={`${commonClass} text-zinc-500 opacity-80`}
+                title="Any Communication"
+            />
+        ),
     };
 
+
+
     return (
-        <div className="bg-gray-900 border-2 border-red-500 rounded-lg shadow-md w-full ">
+        <div className="bg-gray-900 border-2 border-transparent rounded-lg shadow-md w-full ">
             <div className="p-6">
                 <div className="flex items-center mb-4">
                     {user?.profile_picture ? (
