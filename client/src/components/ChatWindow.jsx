@@ -262,7 +262,7 @@ export default function ChatWindow({ remoteUser, setRemoteUser, remoteUserID, se
                                     type="text"
                                     value={newMessage}
                                     onChange={(e) => handleTyping(e.target.value)}
-                                    className="flex-grow bg-gray-900 text-white rounded-l-lg p-2 focus:outline-none"
+                                    className="flex-grow bg-gray-800 text-white rounded-l-lg p-2 focus:outline-none"
                                     onKeyDown={async (e) => {
                                         if (e.key === "Enter") {
                                             e.preventDefault();
