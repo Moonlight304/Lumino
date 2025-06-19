@@ -2,6 +2,14 @@
 
 Lumino is an innovative social gaming platform designed to revolutionize the way gamers connect, find teammates, and build communities. Whether you're looking for casual players or competitive teammates, Lumino provides a seamless experience with real-time interactions and an engaging feed to keep you updated.
 
+![alt text](screenshots/Screenshot_20250619_195121.png)
+![alt text](screenshots/Screenshot_20250619_192647.png) 
+![alt text](screenshots/Screenshot_20250619_193202.png)
+![alt text](screenshots/Screenshot_20250619_193227.png)
+![alt text](screenshots/Screenshot_20250619_194510.png) 
+![alt text](screenshots/Screenshot_20250619_194625.png)
+![alt text](screenshots/Screenshot_20250619_194657.png)
+
 ## Features
 - **Feed** – Stay updated with posts and updates from other gamers.
 - **User Profiles** – Create a gaming profile with your favorite games and stats.
@@ -9,16 +17,15 @@ Lumino is an innovative social gaming platform designed to revolutionize the way
 - **Filter-Based Search** – Easily search for teammates based on various criteria.
 - **Team Finder** – Match with players for competitive or casual play.
 - **Live Chat & Messaging** – Communicate with friends and teammates in real-time.
-- **Reactions & Comments** – Engage with posts on the feed through likes and comments.
-- **Party System** – Form groups to easily coordinate matches with teammates.
+- **Reactions** – Engage with posts on the feed through likes.
 
 ## Tech Stack
 - **Frontend:** React.js
 - **Backend:** Express.js
 - **Database:** MongoDB
 - **Real-Time Features:** socket.io
-- **Concurrent Task Management:** Concurrently
-- **Hosting:** Vercel
+- **File uploads:** multer
+- **Hosting:** Vercel, Render
 
 ## Installation
 1. Clone the repository:
