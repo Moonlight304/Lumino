@@ -278,16 +278,36 @@ router.post('/forgot-password', async (req, res) => {
 
         const token = jwt.sign({
             email: user.email
-        }, JWT_SECRET, { expiresIn: "15m" });
+        }, ACCESS_SECRET, { expiresIn: "15m" });
 
         const resetLink = `${process.env.client_url}/reset-password?token=${token}`;
 
         await transporter.sendMail({
             from: process.env.EMAIL_USER,
             to: user.email,
-            subject: "Lumino Password Reset",
-            text: `Click the link to reset your password: ${resetLink}`
-        });
+            subject: "Reset Your Lumino Password",
+            html: `
+                <div style="font-family: Arial, sans-serif; background-color: #0f0f0f; color: #f4f4f4; padding: 30px; border-radius: 10px; max-width: 500px; margin: auto; border: 1px solid #2c2c2c;">
+                <h2 style="color: #ff3c3c; text-align: center;">Lumino</h2>
+                <p style="font-size: 15px;">Hey ${user.name || "there"},</p>
+                <p style="font-size: 15px;">
+                    We received a request to reset your password. Click the button below to reset it:
+                </p>
+                <div style="text-align: center; margin: 20px 0;">
+                    <a href="${resetLink}" style="background-color: #ff3c3c; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
+                    Reset Password
+                    </a>
+                </div>
+                <p style="font-size: 13px; color: #aaaaaa;">
+                    If you didn’t request this, you can safely ignore this email.
+                </p>
+                <p style="font-size: 13px; color: #aaaaaa;">
+                    — The Lumino Team
+                </p>
+                </div>
+            `,
+            });
+
 
         return res.json({
             status: "success",
@@ -307,7 +327,7 @@ router.post("/reset-password", async (req, res) => {
     const { token, password } = req.body;
 
     try {
-        const decoded = jwt.verify(token, JWT_SECRET);
+        const decoded = jwt.verify(token, ACCESS_SECRET);
         const user = await User.findOne({ email: decoded.email });
 
         if (!user)
